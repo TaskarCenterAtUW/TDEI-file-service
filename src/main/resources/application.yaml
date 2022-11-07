@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: tdei-filesvc
+server:
+  port: '8083'
+spring-doc:
+  swagger-ui:
+    operationsSorter: alpha
+    tagsSorter: alpha
+    disable-swagger-default-url: 'true'
+  writer-with-default-pretty-printer: 'true'
+swagger:
+  description: File service API, this API is responsible any service related to the file operation required to be executed like uploading blob, deleting, generate downloadable links etc. This service will be exposed on Azure intranet and can be consumed by Azure intranet applications/services.
+  contact:
+    name: TDEI Support
+    email: placeholder_support@transequity.cs.washington.edu
+    url: https://placeholder.transequity.cs.washington.edu/support
+  title: TDEI API
+  version: v0.1
+logging:
+  level:
+    root: info
+    web: info
+azure:
+  blob:
+    store:
+      connectionString: ${azure_blob_store_connection_string}
+      containerName: ${azure_blob_store_connection_name}
