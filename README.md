@@ -29,7 +29,7 @@ versions used.
 Clone the project from source controller
 
 ```aidl
-$ git clone https://TDEI-UW@dev.azure.com/TDEI-UW/TDEI/_git/gateway
+$ git clone https://TDEI-UW@dev.azure.com/TDEI-UW/TDEI/_git/file-service
 ```
 
 ## Building the project
@@ -96,4 +96,4 @@ Process Flow Diagram:
 
 Development API documentation link
 
-https://tdei-gateway.azurewebsites.net/swagger-ui/index.html
+https://tdei-filesvc.azurewebsites.net/swagger-ui/index.html
