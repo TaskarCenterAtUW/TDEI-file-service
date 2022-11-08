@@ -1,7 +1,7 @@
 package com.tdei.filesvc.common.service;
 
 import com.tdei.filesvc.common.service.common.contract.IStorageService;
-import com.tdei.filesvc.common.service.provider.AzureStorageService;
+import com.tdei.filesvc.common.service.provider.AzureStorageServiceProvider;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class StorageService implements IStorageService {
-    private final AzureStorageService azureStorageService;
+    private final AzureStorageServiceProvider azureStorageService;
 
     @Override
     public String uploadBlob(MultipartFile file, String agencyId, String containerName) throws FileUploadException {
