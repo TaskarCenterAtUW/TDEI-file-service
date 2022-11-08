@@ -57,7 +57,7 @@ $ mvn clean install
 
 ```
 $ cd target
-$ java -jar -Dspring.profiles.active=dev gateway-0.0.1.jar
+$ java -jar -Dspring.profiles.active=dev filesvc-0.0.1.jar
 ```
 
 ### 3. Browse API documentation
@@ -82,7 +82,7 @@ $ mvn test
 
 ### Continuous Integration (CI)
 
-Currently CI is not implemented as part of Azure pipeline. Test automated integration will be taken up in next
+Currently, CI is not implemented as part of Azure pipeline. Test automated integration will be taken up in next
 development cycle.
 
 ### Continuous Deployment (CD)
