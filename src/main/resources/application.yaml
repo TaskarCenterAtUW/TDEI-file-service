@@ -1,6 +1,8 @@
-spring:
-  application:
-    name: tdei-filesvc
+application:
+  app-name: tdei-filesvc
+  gtfs-flex-container-name: gtfsflex
+  gtfs-pathways-container-name: gtfspathways
+  osw-container-name: osw
 server:
   port: '8083'
 spring-doc:
@@ -19,10 +21,13 @@ swagger:
   version: v0.1
 logging:
   level:
-    root: info
-    web: info
-azure:
-  blob:
-    store:
-      connectionString: ${azure_blob_store_connection_string}
-      containerName: ${azure_blob_store_connection_name}
+    root: debug
+    web: debug
+cloud:
+  azure:
+    storage:
+      blob:
+        account-name: tdeisamplestorage
+        account-key: l9JSJCGq9NrXqRVKApSk1wwV27aWaOVuxeY0NWOZz2svIlJzyncr3UFTzLoAanFbmJIeb2WmwIcS+AStj5gELg==
+        endpoint: https://tdeisamplestorage.blob.core.windows.net/
+        connection-string: DefaultEndpointsProtocol=https;AccountName=tdeisamplestorage;AccountKey=l9JSJCGq9NrXqRVKApSk1wwV27aWaOVuxeY0NWOZz2svIlJzyncr3UFTzLoAanFbmJIeb2WmwIcS+AStj5gELg==;EndpointSuffix=core.windows.net

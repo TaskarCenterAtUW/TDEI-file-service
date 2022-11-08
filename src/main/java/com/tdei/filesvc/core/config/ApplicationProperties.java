@@ -10,9 +10,18 @@ import org.springframework.stereotype.Component;
 @Data
 public class ApplicationProperties {
     private SwaggerProperties swagger;
-    private keycloakProperties keycloak;
-    private KeycloakEndpointUrls keycloakClientEndpoints;
-    private String appname;
+    private CloudProperties cloud;
+    private AppProperties application;
+
+
+    @Data
+    @NoArgsConstructor
+    public static class AppProperties {
+        private String appName;
+        private String gtfsFlexContainerName;
+        private String gtfsPathwaysContainerName;
+        private String oswContainerName;
+    }
 
     @Data
     @NoArgsConstructor
@@ -34,24 +43,29 @@ public class ApplicationProperties {
 
     @Data
     @NoArgsConstructor
-    public static class keycloakProperties {
-        private String authServerUrl;
-        //private String userUrl;
-        private String realm;
-        private String resource;
-        private KeycloakCreds credentials;
+    public static class CloudProperties {
+        private Azure azure;
 
         @Data
         @NoArgsConstructor
-        public static class KeycloakCreds {
-            private String secret = "";
-        }
-    }
+        public static class Azure {
+            private Storage storage;
 
-    @Data
-    @NoArgsConstructor
-    public static class KeycloakEndpointUrls {
-        private String userUrl;
+            @Data
+            @NoArgsConstructor
+            public static class Storage {
+                private BlobProperty blob;
+
+                @Data
+                @NoArgsConstructor
+                public static class BlobProperty {
+                    private String accountName;
+                    private String accountKey;
+                    private String endpoint;
+                    private String connectionString;
+                }
+            }
+        }
     }
 }
 
