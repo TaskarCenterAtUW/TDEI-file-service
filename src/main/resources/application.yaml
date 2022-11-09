@@ -1,3 +1,6 @@
+spring:
+  config:
+    import: optional:developer-local-properties.yaml
 application:
   app-name: tdei-filesvc
 
@@ -36,6 +39,6 @@ cloud:
     storage:
       blob:
         account-name: tdeisamplestorage
-        account-key: l9JSJCGq9NrXqRVKApSk1wwV27aWaOVuxeY0NWOZz2svIlJzyncr3UFTzLoAanFbmJIeb2WmwIcS+AStj5gELg==
+        account-key:
         endpoint: https://tdeisamplestorage.blob.core.windows.net/
-        connection-string: DefaultEndpointsProtocol=https;AccountName=tdeisamplestorage;AccountKey=l9JSJCGq9NrXqRVKApSk1wwV27aWaOVuxeY0NWOZz2svIlJzyncr3UFTzLoAanFbmJIeb2WmwIcS+AStj5gELg==;EndpointSuffix=core.windows.net
+        connection-string:
