@@ -31,7 +31,6 @@ public interface IGtfsFlexFileController {
             produces = {"application/json"},
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             method = RequestMethod.POST)
-//    @RequestBody(content = @Content(encoding = @Encoding(name = "meta", contentType = "application/json")))
     ResponseEntity<String> uploadGtfsFlexFile(@RequestPart("meta") @Valid GtfsFlexUpload meta,
                                               @RequestPart("agencyId") @Valid String agencyId,
                                               @RequestPart("file") @NotNull MultipartFile file, HttpServletRequest httpServletRequest) throws FileUploadException;
