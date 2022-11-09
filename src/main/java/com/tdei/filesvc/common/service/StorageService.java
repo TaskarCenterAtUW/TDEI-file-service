@@ -7,8 +7,9 @@ import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Optional;
 import java.util.UUID;
+
+import static com.tdei.filesvc.common.utils.Utility.getExtensionByStringHandling;
 
 @Service
 @RequiredArgsConstructor
@@ -21,11 +22,5 @@ public class StorageService implements IStorageService {
         String fileName = String.join(".", agencyId + "_" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString().replace("-", ""), extension);
 
         return azureStorageService.uploadBlob(file, fileName, containerName);
-    }
-
-    private Optional<String> getExtensionByStringHandling(String filename) {
-        return Optional.ofNullable(filename)
-                .filter(f -> f.contains("."))
-                .map(f -> f.substring(filename.lastIndexOf(".") + 1));
     }
 }

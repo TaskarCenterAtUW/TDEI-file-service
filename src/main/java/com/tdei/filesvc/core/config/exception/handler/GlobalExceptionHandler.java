@@ -1,5 +1,6 @@
 package com.tdei.filesvc.core.config.exception.handler;
 
+import com.tdei.filesvc.core.config.exception.handler.exceptions.FileExtensionNotAllowedException;
 import com.tdei.filesvc.core.config.exception.handler.exceptions.InvalidAccessTokenException;
 import com.tdei.filesvc.core.config.exception.handler.exceptions.InvalidCredentialsException;
 import com.tdei.filesvc.core.config.exception.handler.exceptions.ResourceNotFoundException;
@@ -146,6 +147,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         details.add(ex.getMessage());
 
         ApiError err = new ApiError(LocalDateTime.now(), HttpStatus.NOT_FOUND, "Invalid Access Token", details);
+
+        return ResponseEntityBuilder.build(err);
+    }
+
+    @ExceptionHandler(FileExtensionNotAllowedException.class)
+    public ResponseEntity<Object> handleFileExtensionNotAllowedException(FileExtensionNotAllowedException ex) {
+
+        List<String> details = new ArrayList<>();
+        details.add(ex.getMessage());
+
+        ApiError err = new ApiError(LocalDateTime.now(), HttpStatus.BAD_REQUEST, "File Type Not Supported", details);
 
         return ResponseEntityBuilder.build(err);
     }

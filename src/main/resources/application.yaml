@@ -1,8 +1,16 @@
 application:
   app-name: tdei-filesvc
+
+gtfs-flex:
   gtfs-flex-container-name: gtfsflex
+  upload-allowed-ext: zip
+gtfs-pathways:
   gtfs-pathways-container-name: gtfspathways
+  upload-allowed-extensions: zip
+osw:
   osw-container-name: osw
+  upload-allowed-ext: zip
+
 server:
   port: '8083'
 spring-doc:
@@ -17,7 +25,7 @@ swagger:
     name: TDEI Support
     email: placeholder_support@transequity.cs.washington.edu
     url: https://placeholder.transequity.cs.washington.edu/support
-  title: TDEI API
+  title: TDEI File Service API
   version: v0.1
 logging:
   level:

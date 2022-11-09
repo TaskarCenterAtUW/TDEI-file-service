@@ -12,15 +12,35 @@ public class ApplicationProperties {
     private SwaggerProperties swagger;
     private CloudProperties cloud;
     private AppProperties application;
+    private GtfsFlexProperties gtfsFlex;
+    private GtfsPathwaysProperties gtfsPathways;
+    private OswProperties osw;
 
+    @Data
+    @NoArgsConstructor
+    public static class GtfsFlexProperties {
+        private String uploadAllowedExtensions;
+        private String gtfsFlexContainerName;
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class GtfsPathwaysProperties {
+        private String uploadAllowedExtensions;
+        private String gtfsPathwaysContainerName;
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class OswProperties {
+        private String uploadAllowedExtensions;
+        private String oswContainerName;
+    }
 
     @Data
     @NoArgsConstructor
     public static class AppProperties {
         private String appName;
-        private String gtfsFlexContainerName;
-        private String gtfsPathwaysContainerName;
-        private String oswContainerName;
     }
 
     @Data
