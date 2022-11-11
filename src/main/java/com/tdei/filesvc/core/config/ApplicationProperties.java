@@ -21,6 +21,7 @@ public class ApplicationProperties {
     public static class GtfsFlexProperties {
         private String uploadAllowedExtensions;
         private String gtfsFlexContainerName;
+        private String uploadTopicName;
     }
 
     @Data
@@ -28,6 +29,7 @@ public class ApplicationProperties {
     public static class GtfsPathwaysProperties {
         private String uploadAllowedExtensions;
         private String gtfsPathwaysContainerName;
+        private String uploadTopicName;
     }
 
     @Data
@@ -35,6 +37,7 @@ public class ApplicationProperties {
     public static class OswProperties {
         private String uploadAllowedExtensions;
         private String oswContainerName;
+        private String uploadTopicName;
     }
 
     @Data
@@ -70,6 +73,7 @@ public class ApplicationProperties {
         @NoArgsConstructor
         public static class Azure {
             private Storage storage;
+            private ServiceBusProperties serviceBus;
 
             @Data
             @NoArgsConstructor
@@ -84,6 +88,12 @@ public class ApplicationProperties {
                     private String endpoint;
                     private String connectionString;
                 }
+            }
+
+            @Data
+            @NoArgsConstructor
+            public static class ServiceBusProperties {
+                private String connectionString;
             }
         }
     }

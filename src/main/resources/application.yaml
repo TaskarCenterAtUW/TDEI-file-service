@@ -7,12 +7,15 @@ application:
 gtfs-flex:
   gtfs-flex-container-name: gtfsflex
   upload-allowed-extensions: zip
+  upload-topic-name: gtfs-flex-upload
 gtfs-pathways:
   gtfs-pathways-container-name: gtfspathways
   upload-allowed-extensions: zip
+  upload-topic-name: gtfs-pathways-upload
 osw:
   osw-container-name: osw
   upload-allowed-extensions: zip
+  upload-topic-name: osw-upload
 
 server:
   port: '8083'
@@ -42,3 +45,5 @@ cloud:
         account-key:
         endpoint: https://tdeisamplestorage.blob.core.windows.net/
         connection-string:
+    service-bus:
+      connection-string:

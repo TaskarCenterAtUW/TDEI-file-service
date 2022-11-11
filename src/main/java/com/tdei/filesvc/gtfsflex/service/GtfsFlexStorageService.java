@@ -1,9 +1,13 @@
 package com.tdei.filesvc.gtfsflex.service;
 
+import com.tdei.filesvc.common.model.QueueMessage;
+import com.tdei.filesvc.common.service.EventBusService;
 import com.tdei.filesvc.common.service.StorageService;
 import com.tdei.filesvc.core.config.ApplicationProperties;
 import com.tdei.filesvc.core.config.exception.handler.exceptions.FileExtensionNotAllowedException;
+import com.tdei.filesvc.gtfsflex.mapper.GtfsFlexUploadMapper;
 import com.tdei.filesvc.gtfsflex.model.GtfsFlexUpload;
+import com.tdei.filesvc.gtfsflex.model.GtfsFlexUploadMessage;
 import com.tdei.filesvc.gtfsflex.service.contract.IGtfsFlexStorageService;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
@@ -21,6 +25,7 @@ import static com.tdei.filesvc.common.utils.Utility.getExtensionByStringHandling
 @RequiredArgsConstructor
 public class GtfsFlexStorageService implements IGtfsFlexStorageService {
     private final StorageService storageService;
+    private final EventBusService eventBusService;
     private final ApplicationProperties applicationProperties;
 
     @Override
@@ -39,7 +44,17 @@ public class GtfsFlexStorageService implements IGtfsFlexStorageService {
         //Pattern: Year/Month/AgencyId/filename.extension
         //ex. 2022/11/101/testfile_1668063783868_295d783c624c4f86a7f09b116d55dfd0.zip
         String uploadPath = year + "/" + month + "/" + agencyId + "/" + fileName;
+        String fileUploadedPath = storageService.uploadBlob(file, uploadPath, applicationProperties.getGtfsFlex().getGtfsFlexContainerName());
 
-        return storageService.uploadBlob(file, uploadPath, applicationProperties.getGtfsFlex().getGtfsFlexContainerName());
+        //Send message to the Queue
+        GtfsFlexUploadMessage gtfsFlexMessge = GtfsFlexUploadMapper.INSTANCE.fromGtfsFlexUpload(meta);
+        gtfsFlexMessge.setFileUploadPath(fileUploadedPath);
+
+        QueueMessage message = new QueueMessage();
+        message.setMessageType("gtfsflex");
+        message.setMessage("New Data published for the Agency:" + agencyId);
+        message.setData(gtfsFlexMessge);
+        eventBusService.sendMessage(message, applicationProperties.getGtfsFlex().getUploadTopicName());
+        return "File Uploaded Successfully !";
     }
 }

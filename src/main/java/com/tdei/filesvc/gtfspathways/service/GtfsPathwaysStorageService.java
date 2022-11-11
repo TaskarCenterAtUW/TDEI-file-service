@@ -1,9 +1,13 @@
 package com.tdei.filesvc.gtfspathways.service;
 
+import com.tdei.filesvc.common.model.QueueMessage;
+import com.tdei.filesvc.common.service.EventBusService;
 import com.tdei.filesvc.common.service.StorageService;
 import com.tdei.filesvc.core.config.ApplicationProperties;
 import com.tdei.filesvc.core.config.exception.handler.exceptions.FileExtensionNotAllowedException;
+import com.tdei.filesvc.gtfspathways.mapper.GtfsPathwaysUploadMapper;
 import com.tdei.filesvc.gtfspathways.model.GtfsPathwaysUpload;
+import com.tdei.filesvc.gtfspathways.model.GtfsPathwaysUploadMessage;
 import com.tdei.filesvc.gtfspathways.service.contract.IGtfsPathwaysStorageService;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
@@ -21,6 +25,7 @@ import static com.tdei.filesvc.common.utils.Utility.getExtensionByStringHandling
 @RequiredArgsConstructor
 public class GtfsPathwaysStorageService implements IGtfsPathwaysStorageService {
     private final StorageService storageService;
+    private final EventBusService eventBusService;
     private final ApplicationProperties applicationProperties;
 
     @Override
@@ -40,6 +45,17 @@ public class GtfsPathwaysStorageService implements IGtfsPathwaysStorageService {
         //ex. 2022/11/101/testfile_1668063783868_295d783c624c4f86a7f09b116d55dfd0.zip
         String uploadPath = year + "/" + month + "/" + agencyId + "/" + fileName;
 
-        return storageService.uploadBlob(file, uploadPath, applicationProperties.getGtfsPathways().getGtfsPathwaysContainerName());
+        String fileUploadedPath = storageService.uploadBlob(file, uploadPath, applicationProperties.getGtfsPathways().getGtfsPathwaysContainerName());
+        //Send message to the Queue
+        GtfsPathwaysUploadMessage gtfsPathwaysMessge = GtfsPathwaysUploadMapper.INSTANCE.fromGtfsPathwaysUpload(meta);
+        gtfsPathwaysMessge.setFileUploadPath(fileUploadedPath);
+
+        QueueMessage message = new QueueMessage();
+        message.setMessageType("gtfspathways");
+        message.setMessage("New Data published for the Agency:" + agencyId);
+        message.setData(gtfsPathwaysMessge);
+        eventBusService.sendMessage(message, applicationProperties.getGtfsPathways().getUploadTopicName());
+        return "File Uploaded Successfully !";
+
     }
 }
