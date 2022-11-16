@@ -29,7 +29,7 @@ public class GtfsPathwaysStorageService implements IGtfsPathwaysStorageService {
     private final ApplicationProperties applicationProperties;
 
     @Override
-    public String uploadBlob(GtfsPathwaysUpload meta, String agencyId, MultipartFile file) throws FileUploadException {
+    public String uploadBlob(GtfsPathwaysUpload meta, String tdeiOrgId, String userId, MultipartFile file) throws FileUploadException {
         String fileExtension = getExtensionByStringHandling(file.getOriginalFilename()).get();
         List<String> allowedExtensions = Arrays.stream(applicationProperties.getGtfsPathways().getUploadAllowedExtensions().split(",")).toList();
 
@@ -43,19 +43,20 @@ public class GtfsPathwaysStorageService implements IGtfsPathwaysStorageService {
 
         //Pattern: Year/Month/AgencyId/filename.extension
         //ex. 2022/11/101/testfile_1668063783868_295d783c624c4f86a7f09b116d55dfd0.zip
-        String uploadPath = year + "/" + month + "/" + agencyId + "/" + fileName;
+        String uploadPath = year + "/" + month + "/" + tdeiOrgId + "/" + fileName;
 
         String fileUploadedPath = storageService.uploadBlob(file, uploadPath, applicationProperties.getGtfsPathways().getGtfsPathwaysContainerName());
         //Send message to the Queue
         GtfsPathwaysUploadMessage gtfsPathwaysMessge = GtfsPathwaysUploadMapper.INSTANCE.fromGtfsPathwaysUpload(meta);
         gtfsPathwaysMessge.setFileUploadPath(fileUploadedPath);
+        gtfsPathwaysMessge.setUserId(userId);
 
         QueueMessage message = new QueueMessage();
         message.setMessageType("gtfspathways");
-        message.setMessage("New Data published for the Agency:" + agencyId);
+        message.setMessage("New Data published for theOrganization:" + tdeiOrgId);
         message.setData(gtfsPathwaysMessge);
         eventBusService.sendMessage(message, applicationProperties.getGtfsPathways().getUploadTopicName());
-        return "File Uploaded Successfully !";
+        return "Received the file, request is under process.";
 
     }
 }

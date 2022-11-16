@@ -29,7 +29,7 @@ public class GtfsFlexStorageService implements IGtfsFlexStorageService {
     private final ApplicationProperties applicationProperties;
 
     @Override
-    public String uploadBlob(GtfsFlexUpload meta, String agencyId, MultipartFile file) throws FileUploadException {
+    public String uploadBlob(GtfsFlexUpload meta, String tdeiOrgId, String userId, MultipartFile file) throws FileUploadException {
         String fileExtension = getExtensionByStringHandling(file.getOriginalFilename()).get();
         List<String> allowedExtensions = Arrays.stream(applicationProperties.getGtfsFlex().getUploadAllowedExtensions().split(",")).toList();
 
@@ -43,18 +43,20 @@ public class GtfsFlexStorageService implements IGtfsFlexStorageService {
 
         //Pattern: Year/Month/AgencyId/filename.extension
         //ex. 2022/11/101/testfile_1668063783868_295d783c624c4f86a7f09b116d55dfd0.zip
-        String uploadPath = year + "/" + month + "/" + agencyId + "/" + fileName;
+        String uploadPath = year + "/" + month + "/" + tdeiOrgId + "/" + fileName;
         String fileUploadedPath = storageService.uploadBlob(file, uploadPath, applicationProperties.getGtfsFlex().getGtfsFlexContainerName());
 
         //Send message to the Queue
         GtfsFlexUploadMessage gtfsFlexMessge = GtfsFlexUploadMapper.INSTANCE.fromGtfsFlexUpload(meta);
         gtfsFlexMessge.setFileUploadPath(fileUploadedPath);
+        gtfsFlexMessge.setUserId(userId);
 
         QueueMessage message = new QueueMessage();
         message.setMessageType("gtfsflex");
-        message.setMessage("New Data published for the Agency:" + agencyId);
+        message.setMessage("New Data published for the Organization:" + tdeiOrgId);
         message.setData(gtfsFlexMessge);
         eventBusService.sendMessage(message, applicationProperties.getGtfsFlex().getUploadTopicName());
-        return "File Uploaded Successfully !";
+        return "Received the file, request is under process.";
+
     }
 }

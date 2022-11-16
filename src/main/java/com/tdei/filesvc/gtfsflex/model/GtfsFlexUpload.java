@@ -11,16 +11,16 @@ import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 
 /**
- * represents meta data needed to upload a gtfs_flex data file
+ * Represents meta data needed to upload a gtfs_flex data file
  */
-@Schema(description = "represents meta data needed to upload a gtfs_flex data file")
+@Schema(description = "Represents meta data needed to upload a gtfs_flex data file")
 @Validated
 @Data
 public class GtfsFlexUpload {
-    @Schema(required = true, description = "tdei-assigned agency id. Represented as UUID. Agency ids can be retrieved using the /api/v1.0/agencies path.")
+    @Schema(required = true, description = "tdei-assigned organization id. Represented as UUID. Organization ids can be retrieved using the /api/v1.0/organizations path.")
     @NotNull
-    @JsonProperty("tdei_agency_id")
-    private String tdeiAgencyId = null;
+    @JsonProperty("tdei_org_id")
+    private String tdeiOrgId = null;
 
     @Schema(required = true, description = "Description of who data was collected by. See Best Practices document for information on how to format this string.")
     @NotNull

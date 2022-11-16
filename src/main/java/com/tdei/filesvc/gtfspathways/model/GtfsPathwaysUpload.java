@@ -1,7 +1,6 @@
 package com.tdei.filesvc.gtfspathways.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.tdei.filesvc.common.model.Polygon;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
@@ -13,14 +12,19 @@ import java.time.OffsetDateTime;
 /**
  * Describes a gtfs pathways file meta data. Same as gtfs_pathways, but adds uri.
  */
-@Schema(description = "Describes a gtfs pathways file meta data. Same as gtfs_pathways, but adds uri.")
+@Schema(description = "Describes a gtfs pathways file meta data.")
 @Validated
 @Data
 public class GtfsPathwaysUpload {
-    @Schema(required = true, description = "tdei-assigned agency id. Represented as UUID. Agency ids can be retrieved using the /api/v1.0/agencies path.")
+    @Schema(required = true, description = "tdei-assigned organization id. Represented as UUID. Organization ids can be retrieved using the /api/v1.0/organizations path.")
     @NotNull
-    @JsonProperty("tdei_agency_id")
-    private String tdeiAgencyId = null;
+    @JsonProperty("tdei_org_id")
+    private String tdeiOrgId = null;
+
+    @Schema(required = true, description = "tdei-assigned station id. Represented as UUID. Station ids can be retrieved using the /api/v1.0/stations path.")
+    @NotNull
+    @JsonProperty("tdei_station_id")
+    private String tdeiStationId = null;
 
     @Schema(required = true, description = "Description of who data was collected by. See Best Practices document for information on how to format this string.")
     @NotNull
@@ -53,11 +57,6 @@ public class GtfsPathwaysUpload {
     @NotNull
     @JsonProperty("data_source")
     private String dataSource = null;
-
-    @Schema(required = true, description = "")
-    @NotNull
-    @JsonProperty("polygon")
-    private Polygon polygon = null;
 
     @Schema(required = true, description = "version of gtfs pathways schema this file conforms to")
     @NotNull

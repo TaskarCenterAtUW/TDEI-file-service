@@ -22,8 +22,8 @@ public class GtfsPathwaysFileController implements IGtfsPathwaysFileController {
     private final GtfsPathwaysStorageService storageService;
 
     @Override
-    public ResponseEntity<String> uploadGtfsPathwaysFile(GtfsPathwaysUpload meta, String agencyId, MultipartFile file, HttpServletRequest httpServletRequest) throws FileUploadException {
-        return ResponseEntity.ok(storageService.uploadBlob(meta, agencyId, file));
+    public ResponseEntity<String> uploadGtfsPathwaysFile(GtfsPathwaysUpload meta, String tdeiOrgId, String userId, MultipartFile file, HttpServletRequest httpServletRequest) throws FileUploadException {
+        return ResponseEntity.ok(storageService.uploadBlob(meta, tdeiOrgId, userId, file));
     }
 
 }

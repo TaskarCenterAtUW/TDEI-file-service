@@ -29,7 +29,7 @@ public class OswStorageService implements IOswStorageService {
     private final ApplicationProperties applicationProperties;
 
     @Override
-    public String uploadBlob(OswUpload meta, String agencyId, MultipartFile file) throws FileUploadException {
+    public String uploadBlob(OswUpload meta, String tdeiOrgId, String userId, MultipartFile file) throws FileUploadException {
         String fileExtension = getExtensionByStringHandling(file.getOriginalFilename()).get();
         List<String> allowedExtensions = Arrays.stream(applicationProperties.getOsw().getUploadAllowedExtensions().split(",")).toList();
 
@@ -43,18 +43,21 @@ public class OswStorageService implements IOswStorageService {
 
         //Pattern: filetype/Year/Month/AgencyId/filename.extension
         //ex. osw/2022/November/101/testfile_1668063783868_295d783c624c4f86a7f09b116d55dfd0.zip
-        String uploadPath = year + "/" + month + "/" + agencyId + "/" + fileName;
+        String uploadPath = year + "/" + month + "/" + tdeiOrgId + "/" + fileName;
         String fileUploadedPath = storageService.uploadBlob(file, uploadPath, applicationProperties.getOsw().getOswContainerName());
 
         //Send message to the Queue
         OswUploadMessage oswUploadmsg = OswUploadMapper.INSTANCE.fromOswUpload(meta);
         oswUploadmsg.setFileUploadPath(fileUploadedPath);
+        oswUploadmsg.setUserId(userId);
+
 
         QueueMessage message = new QueueMessage();
         message.setMessageType("osw");
-        message.setMessage("New Data published for the Agency:" + agencyId);
+        message.setMessage("New Data published for theOrganization:" + tdeiOrgId);
         message.setData(oswUploadmsg);
         eventBusService.sendMessage(message, applicationProperties.getGtfsPathways().getUploadTopicName());
-        return "File Uploaded Successfully !";
+        return "Received the file, request is under process.";
+
     }
 }
