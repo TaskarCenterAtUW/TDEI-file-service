@@ -22,7 +22,7 @@ public class GtfsFlexFileController implements IGtfsFlexFileController {
     private final GtfsFlexStorageService storageService;
 
     @Override
-    public ResponseEntity<String> uploadGtfsFlexFile(GtfsFlexUpload meta, String agencyId, MultipartFile file, HttpServletRequest httpServletRequest) throws FileUploadException {
-        return ResponseEntity.ok(storageService.uploadBlob(meta, agencyId, file));
+    public ResponseEntity<String> uploadGtfsFlexFile(GtfsFlexUpload meta, String tdeiOrgId, String userId, MultipartFile file, HttpServletRequest httpServletRequest) throws FileUploadException {
+        return ResponseEntity.ok(storageService.uploadBlob(meta, tdeiOrgId, userId, file));
     }
 }

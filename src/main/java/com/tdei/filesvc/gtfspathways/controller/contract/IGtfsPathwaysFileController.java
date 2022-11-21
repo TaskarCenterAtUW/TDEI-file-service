@@ -32,7 +32,8 @@ public interface IGtfsPathwaysFileController {
             consumes = {"multipart/form-data"},
             method = RequestMethod.POST)
     ResponseEntity<String> uploadGtfsPathwaysFile(@RequestPart("meta") @Valid GtfsPathwaysUpload meta,
-                                                  @RequestPart("agencyId") @Valid String agencyId,
+                                                  @RequestPart("tdeiOrgId") @Valid String tdeiOrgId,
+                                                  @RequestPart("userId") @Valid String userId,
                                                   @RequestPart("file") @Valid @NotNull MultipartFile file, HttpServletRequest httpServletRequest) throws FileUploadException;
 
 }

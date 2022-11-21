@@ -21,7 +21,7 @@ public class OswFileController implements IOswFileController {
     private final OswStorageService storageService;
 
     @Override
-    public ResponseEntity<String> uploadOswFile(OswUpload meta, String agencyId, MultipartFile file, HttpServletRequest httpServletRequest) throws FileUploadException {
-        return ResponseEntity.ok(storageService.uploadBlob(meta, agencyId, file));
+    public ResponseEntity<String> uploadOswFile(OswUpload meta, String tdeiOrgId, String userId, MultipartFile file, HttpServletRequest httpServletRequest) throws FileUploadException {
+        return ResponseEntity.ok(storageService.uploadBlob(meta, tdeiOrgId, userId, file));
     }
 }

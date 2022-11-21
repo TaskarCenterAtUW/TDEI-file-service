@@ -35,15 +35,19 @@ $ git clone https://TDEI-UW@dev.azure.com/TDEI-UW/TDEI/_git/file-service
 
 Application secrets are not included in the code repository. Below are the instruction for each environment
 
-###### DEV
+###### Local
 
 Request for **developer-local-properties.yaml** file from Admin, which should be copied to below location
 
 ```src/main/resources/developer-local-properties.yaml```
 
-###### PROD
+###### DEV/PROD
 
 Required properties will be set as an environment variables on the deployment environment.
+
+        CLOUD_AZURE_STORAGE_BLOB_ACCOUNT_KEY
+        CLOUD_AZURE_STORAGE_BLOB_CONNECTION_STRING
+        CLOUD_AZURE_STORAGE_SERVICE_BUS_CONNECTION_STRING
 
 ## Building the project
 
