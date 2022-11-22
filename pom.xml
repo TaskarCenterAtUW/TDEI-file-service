@@ -148,7 +148,7 @@
                     <layers>
                         <enabled>true</enabled>
                     </layers>
-                    <mainClass>com.tdei.filesvc</mainClass>
+                    <mainClass>com.tdei.filesvc.FileServiceApplication</mainClass>
                 </configuration>
             </plugin>
             <plugin>
