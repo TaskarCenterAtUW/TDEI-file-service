@@ -76,7 +76,7 @@ public class AzureStorageServiceProvider implements IStorageService {
     }
 
     /**
-     * Covert byte array to flux flux.
+     * Covert byte array to flux.
      *
      * @param byteArray the byte array
      * @return the flux
