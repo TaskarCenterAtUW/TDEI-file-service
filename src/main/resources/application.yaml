@@ -22,7 +22,7 @@ osw:
   upload-topic-name: osw-upload
 
 server:
-  port: '8083'
+  port: '8080'
 spring-doc:
   swagger-ui:
     operationsSorter: alpha
