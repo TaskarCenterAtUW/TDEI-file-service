@@ -36,8 +36,11 @@ public class GtfsPathwaysStorageService implements IGtfsPathwaysStorageService {
         if (!allowedExtensions.contains(fileExtension)) {
             throw new FileExtensionNotAllowedException("Uploaded file extension not supported. Allowed extensions are " + applicationProperties.getGtfsPathways().getUploadAllowedExtensions());
         }
-
-        String fileName = String.join(".", file.getName() + "_" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString().replace("-", ""), fileExtension);
+        String OriginalFileName = file.getName();
+        if (file.getOriginalFilename().lastIndexOf(".") != -1) {
+            OriginalFileName = file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf("."));
+        }
+        String fileName = String.join(".", OriginalFileName + "_" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString().replace("-", ""), fileExtension);
         String year = String.valueOf(LocalDateTime.now().getYear());
         String month = String.valueOf(LocalDateTime.now().getMonth());
 
