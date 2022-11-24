@@ -44,7 +44,7 @@ public class GtfsFlexStorageService implements IGtfsFlexStorageService {
         //Pattern: Year/Month/AgencyId/filename.extension
         //ex. 2022/11/101/testfile_1668063783868_295d783c624c4f86a7f09b116d55dfd0.zip
         String uploadPath = year + "/" + month + "/" + tdeiOrgId + "/" + fileName;
-        String fileUploadedPath = storageService.uploadBlob(file, uploadPath, applicationProperties.getGtfsFlex().getGtfsFlexContainerName());
+        String fileUploadedPath = storageService.uploadBlob(file, uploadPath, applicationProperties.getGtfsFlex().getContainerName());
 
         //Send message to the Queue
         GtfsFlexUploadMessage gtfsFlexMessge = GtfsFlexUploadMapper.INSTANCE.fromGtfsFlexUpload(meta);

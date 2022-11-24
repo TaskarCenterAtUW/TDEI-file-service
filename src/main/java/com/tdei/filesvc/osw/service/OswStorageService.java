@@ -44,7 +44,7 @@ public class OswStorageService implements IOswStorageService {
         //Pattern: filetype/Year/Month/AgencyId/filename.extension
         //ex. osw/2022/November/101/testfile_1668063783868_295d783c624c4f86a7f09b116d55dfd0.zip
         String uploadPath = year + "/" + month + "/" + tdeiOrgId + "/" + fileName;
-        String fileUploadedPath = storageService.uploadBlob(file, uploadPath, applicationProperties.getOsw().getOswContainerName());
+        String fileUploadedPath = storageService.uploadBlob(file, uploadPath, applicationProperties.getOsw().getContainerName());
 
         //Send message to the Queue
         OswUploadMessage oswUploadmsg = OswUploadMapper.INSTANCE.fromOswUpload(meta);

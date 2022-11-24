@@ -20,7 +20,7 @@ public class ApplicationProperties {
     @NoArgsConstructor
     public static class GtfsFlexProperties {
         private String uploadAllowedExtensions;
-        private String gtfsFlexContainerName;
+        private String ContainerName;
         private String uploadTopicName;
     }
 
@@ -28,7 +28,7 @@ public class ApplicationProperties {
     @NoArgsConstructor
     public static class GtfsPathwaysProperties {
         private String uploadAllowedExtensions;
-        private String gtfsPathwaysContainerName;
+        private String ContainerName;
         private String uploadTopicName;
     }
 
@@ -36,7 +36,7 @@ public class ApplicationProperties {
     @NoArgsConstructor
     public static class OswProperties {
         private String uploadAllowedExtensions;
-        private String oswContainerName;
+        private String ContainerName;
         private String uploadTopicName;
     }
 
