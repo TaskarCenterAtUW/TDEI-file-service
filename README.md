@@ -47,7 +47,7 @@ Required properties will be set as an environment variables on the deployment en
 
         CLOUD_AZURE_STORAGE_BLOB_ACCOUNT_KEY
         CLOUD_AZURE_STORAGE_BLOB_CONNECTION_STRING
-        CLOUD_AZURE_STORAGE_SERVICE_BUS_CONNECTION_STRING
+        CLOUD_AZURE_SERVICE_BUS_CONNECTION_STRING
 
 ## Building the project
 
