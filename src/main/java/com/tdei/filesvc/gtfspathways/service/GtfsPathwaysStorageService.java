@@ -45,7 +45,7 @@ public class GtfsPathwaysStorageService implements IGtfsPathwaysStorageService {
         //ex. 2022/11/101/testfile_1668063783868_295d783c624c4f86a7f09b116d55dfd0.zip
         String uploadPath = year + "/" + month + "/" + tdeiOrgId + "/" + fileName;
 
-        String fileUploadedPath = storageService.uploadBlob(file, uploadPath, applicationProperties.getGtfsPathways().getGtfsPathwaysContainerName());
+        String fileUploadedPath = storageService.uploadBlob(file, uploadPath, applicationProperties.getGtfsPathways().getContainerName());
         //Send message to the Queue
         GtfsPathwaysUploadMessage gtfsPathwaysMessge = GtfsPathwaysUploadMapper.INSTANCE.fromGtfsPathwaysUpload(meta);
         gtfsPathwaysMessge.setFileUploadPath(fileUploadedPath);

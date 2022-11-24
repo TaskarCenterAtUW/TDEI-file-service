@@ -9,17 +9,17 @@ application:
   app-name: tdei-filesvc
 
 gtfs-flex:
-  gtfs-flex-container-name: gtfsflex
-  upload-allowed-extensions: zip #Comma separated values
-  upload-topic-name: gtfs-flex-upload
+  container-name: "${GTFS_FLEX_CONTAINER_NAME}"
+  upload-allowed-extensions: "${GTFS_FLEX_UPLOAD_ALLOWED_EXTENSIONS}"
+  upload-topic-name: "${GTFS_FLEX_UPLOAD_TOPIC_NAME}"
 gtfs-pathways:
-  gtfs-pathways-container-name: gtfspathways
-  upload-allowed-extensions: zip #Comma separated values
-  upload-topic-name: gtfs-pathways-upload
+  container-name: "${GTFS_PATHWAYS_CONTAINER_NAME}"
+  upload-allowed-extensions: "${GTFS_PATHWAYS_UPLOAD_ALLOWED_EXTENSIONS}"
+  upload-topic-name: "${GTFS_PATHWAYS_UPLOAD_TOPIC_NAME}"
 osw:
-  osw-container-name: osw
-  upload-allowed-extensions: zip #Comma separated values
-  upload-topic-name: osw-upload
+  container-name: "${OSW_CONTAINER_NAME}"
+  upload-allowed-extensions: "${OSW_UPLOAD_ALLOWED_EXTENSIONS}"
+  upload-topic-name: "${OSW_UPLOAD_TOPIC_NAME}"
 
 server:
   port: '8080'
