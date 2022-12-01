@@ -30,6 +30,7 @@ public class GtfsPathwaysStorageService implements IGtfsPathwaysStorageService {
 
     @Override
     public String uploadBlob(GtfsPathwaysUpload meta, String tdeiOrgId, String userId, MultipartFile file) throws FileUploadException {
+        String tdeiUniqueRecordId = UUID.randomUUID().toString().replace("-", "");
         String fileExtension = getExtensionByStringHandling(file.getOriginalFilename()).get();
         List<String> allowedExtensions = Arrays.stream(applicationProperties.getGtfsPathways().getUploadAllowedExtensions().split(",")).toList();
 
@@ -40,12 +41,12 @@ public class GtfsPathwaysStorageService implements IGtfsPathwaysStorageService {
         if (file.getOriginalFilename().lastIndexOf(".") != -1) {
             OriginalFileName = file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf("."));
         }
-        String fileName = String.join(".", OriginalFileName + "_" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString().replace("-", ""), fileExtension);
+        String fileName = String.join(".", OriginalFileName + "_" + tdeiUniqueRecordId, fileExtension);
         String year = String.valueOf(LocalDateTime.now().getYear());
         String month = String.valueOf(LocalDateTime.now().getMonth());
 
-        //Pattern: Year/Month/AgencyId/filename.extension
-        //ex. 2022/11/101/testfile_1668063783868_295d783c624c4f86a7f09b116d55dfd0.zip
+        //Pattern: Year/Month/orgId/filename_uuid.extension
+        //ex. 2022/11/101/testfile_295d783c624c4f86a7f09b116d55dfd0.zip
         String uploadPath = year + "/" + month + "/" + tdeiOrgId + "/" + fileName;
 
         String fileUploadedPath = storageService.uploadBlob(file, uploadPath, applicationProperties.getGtfsPathways().getContainerName());
@@ -53,13 +54,14 @@ public class GtfsPathwaysStorageService implements IGtfsPathwaysStorageService {
         GtfsPathwaysUploadMessage gtfsPathwaysMessge = GtfsPathwaysUploadMapper.INSTANCE.fromGtfsPathwaysUpload(meta);
         gtfsPathwaysMessge.setFileUploadPath(fileUploadedPath);
         gtfsPathwaysMessge.setUserId(userId);
+        gtfsPathwaysMessge.setTdeiRecordId(tdeiUniqueRecordId);
 
         QueueMessage message = new QueueMessage();
         message.setMessageType("gtfspathways");
         message.setMessage("New Data published for theOrganization:" + tdeiOrgId);
         message.setData(gtfsPathwaysMessge);
         eventBusService.sendMessage(message, applicationProperties.getGtfsPathways().getUploadTopicName());
-        return "Received the file, request is under process.";
+        return tdeiUniqueRecordId;
 
     }
 }

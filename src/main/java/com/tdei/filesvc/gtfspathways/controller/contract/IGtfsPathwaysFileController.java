@@ -28,7 +28,7 @@ public interface IGtfsPathwaysFileController {
             @ApiResponse(responseCode = "500", description = "An server error occurred.", content = @Content)
     })
     @RequestMapping(value = "uploadFile",
-            produces = {"application/json"},
+            produces = {"application/text"},
             consumes = {"multipart/form-data"},
             method = RequestMethod.POST)
     ResponseEntity<String> uploadGtfsPathwaysFile(@RequestPart("meta") @Valid GtfsPathwaysUpload meta,
