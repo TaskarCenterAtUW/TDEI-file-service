@@ -26,7 +26,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class FileServiceApplicationTests {
+class OswTests {
 
     @Mock
     private GtfsPathwaysStorageService gtfsPathwaysStorageService;
@@ -81,7 +81,7 @@ class FileServiceApplicationTests {
         ApplicationProperties props = new ApplicationProperties();
         var gtfsPathwaysProperties = new ApplicationProperties.GtfsPathwaysProperties();
         gtfsPathwaysProperties.setUploadAllowedExtensions("zip");
-        gtfsPathwaysProperties.setGtfsPathwaysContainerName("gtfs-pathways");
+        gtfsPathwaysProperties.setContainerName("gtfs-pathways");
         gtfsPathwaysProperties.setUploadTopicName("uploaded");
         props.setGtfsPathways(gtfsPathwaysProperties);
 
@@ -91,6 +91,6 @@ class FileServiceApplicationTests {
         doNothing().when(eventBusService).sendMessage(any(QueueMessage.class), anyString());
         var result = gtfsPathwaysStorageServiceInjectMock.uploadBlob(new GtfsPathwaysUpload(), orgId, "2039-2829", file);
 
-        assertThat(result).isEqualTo("Received the file, request is under process.");
+        assertThat(result).isNotBlank();
     }
 }

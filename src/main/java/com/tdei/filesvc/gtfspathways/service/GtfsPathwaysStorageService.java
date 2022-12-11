@@ -58,7 +58,7 @@ public class GtfsPathwaysStorageService implements IGtfsPathwaysStorageService {
 
         QueueMessage message = new QueueMessage();
         message.setMessageType("gtfspathways");
-        message.setMessage("New Data published for theOrganization:" + tdeiOrgId);
+        message.setMessage("New Data published for the Organization:" + tdeiOrgId);
         message.setData(gtfsPathwaysMessge);
         eventBusService.sendMessage(message, applicationProperties.getGtfsPathways().getUploadTopicName());
         return tdeiUniqueRecordId;

@@ -7,6 +7,8 @@ import lombok.Data;
 public class OswUploadMessage extends OswUpload {
     @JsonProperty("file_upload_path")
     private String fileUploadPath;
+    @JsonProperty("tdei_record_id")
+    private String tdeiRecordId;
     @JsonProperty("user_id")
     private String userId;
 }
