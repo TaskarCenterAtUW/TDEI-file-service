@@ -30,33 +30,38 @@ public class GtfsFlexStorageService implements IGtfsFlexStorageService {
 
     @Override
     public String uploadBlob(GtfsFlexUpload meta, String tdeiOrgId, String userId, MultipartFile file) throws FileUploadException {
+        String tdeiUniqueRecordId = UUID.randomUUID().toString().replace("-", "");
         String fileExtension = getExtensionByStringHandling(file.getOriginalFilename()).get();
         List<String> allowedExtensions = Arrays.stream(applicationProperties.getGtfsFlex().getUploadAllowedExtensions().split(",")).toList();
 
         if (!allowedExtensions.contains(fileExtension)) {
             throw new FileExtensionNotAllowedException("Uploaded file extension not supported. Allowed extensions are " + applicationProperties.getGtfsFlex().getUploadAllowedExtensions());
         }
-
-        String fileName = String.join(".", file.getName() + "_" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString().replace("-", ""), fileExtension);
+        String OriginalFileName = file.getName();
+        if (file.getOriginalFilename().lastIndexOf(".") != -1) {
+            OriginalFileName = file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf("."));
+        }
+        String fileName = String.join(".", OriginalFileName + "_" + tdeiUniqueRecordId, fileExtension);
         String year = String.valueOf(LocalDateTime.now().getYear());
         String month = String.valueOf(LocalDateTime.now().getMonth());
 
-        //Pattern: Year/Month/AgencyId/filename.extension
-        //ex. 2022/11/101/testfile_1668063783868_295d783c624c4f86a7f09b116d55dfd0.zip
+        //Pattern: Year/Month/orgId/filename_uuid.extension
+        //ex. 2022/11/101/testfile_295d783c624c4f86a7f09b116d55dfd0.zip
         String uploadPath = year + "/" + month + "/" + tdeiOrgId + "/" + fileName;
-        String fileUploadedPath = storageService.uploadBlob(file, uploadPath, applicationProperties.getGtfsFlex().getContainerName());
 
+        String fileUploadedPath = storageService.uploadBlob(file, uploadPath, applicationProperties.getGtfsFlex().getContainerName());
         //Send message to the Queue
-        GtfsFlexUploadMessage gtfsFlexMessge = GtfsFlexUploadMapper.INSTANCE.fromGtfsFlexUpload(meta);
-        gtfsFlexMessge.setFileUploadPath(fileUploadedPath);
-        gtfsFlexMessge.setUserId(userId);
+        GtfsFlexUploadMessage gtfsFlexUploadMessage = GtfsFlexUploadMapper.INSTANCE.fromGtfsFlexUpload(meta);
+        gtfsFlexUploadMessage.setFileUploadPath(fileUploadedPath);
+        gtfsFlexUploadMessage.setUserId(userId);
+        gtfsFlexUploadMessage.setTdeiRecordId(tdeiUniqueRecordId);
 
         QueueMessage message = new QueueMessage();
         message.setMessageType("gtfsflex");
         message.setMessage("New Data published for the Organization:" + tdeiOrgId);
-        message.setData(gtfsFlexMessge);
+        message.setData(gtfsFlexUploadMessage);
         eventBusService.sendMessage(message, applicationProperties.getGtfsFlex().getUploadTopicName());
-        return "Received the file, request is under process.";
+        return tdeiUniqueRecordId;
 
     }
 }

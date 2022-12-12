@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,8 +27,8 @@ public interface IGtfsFlexFileController {
             @ApiResponse(responseCode = "500", description = "An server error occurred.", content = @Content)
     })
     @RequestMapping(value = "uploadFile",
-            produces = {"application/json"},
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = {"application/text"},
+            consumes = {"multipart/form-data"},
             method = RequestMethod.POST)
     ResponseEntity<String> uploadGtfsFlexFile(@RequestPart("meta") @Valid GtfsFlexUpload meta,
                                               @RequestPart("tdeiOrgId") @Valid String tdeiOrgId,

@@ -30,34 +30,38 @@ public class OswStorageService implements IOswStorageService {
 
     @Override
     public String uploadBlob(OswUpload meta, String tdeiOrgId, String userId, MultipartFile file) throws FileUploadException {
+        String tdeiUniqueRecordId = UUID.randomUUID().toString().replace("-", "");
         String fileExtension = getExtensionByStringHandling(file.getOriginalFilename()).get();
         List<String> allowedExtensions = Arrays.stream(applicationProperties.getOsw().getUploadAllowedExtensions().split(",")).toList();
 
         if (!allowedExtensions.contains(fileExtension)) {
             throw new FileExtensionNotAllowedException("Uploaded file extension not supported. Allowed extensions are " + applicationProperties.getOsw().getUploadAllowedExtensions());
         }
-
-        String fileName = String.join(".", file.getName() + "_" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString().replace("-", ""), fileExtension);
+        String OriginalFileName = file.getName();
+        if (file.getOriginalFilename().lastIndexOf(".") != -1) {
+            OriginalFileName = file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf("."));
+        }
+        String fileName = String.join(".", OriginalFileName + "_" + tdeiUniqueRecordId, fileExtension);
         String year = String.valueOf(LocalDateTime.now().getYear());
         String month = String.valueOf(LocalDateTime.now().getMonth());
 
-        //Pattern: filetype/Year/Month/AgencyId/filename.extension
-        //ex. osw/2022/November/101/testfile_1668063783868_295d783c624c4f86a7f09b116d55dfd0.zip
+        //Pattern: Year/Month/orgId/filename_uuid.extension
+        //ex. 2022/11/101/testfile_295d783c624c4f86a7f09b116d55dfd0.zip
         String uploadPath = year + "/" + month + "/" + tdeiOrgId + "/" + fileName;
+
         String fileUploadedPath = storageService.uploadBlob(file, uploadPath, applicationProperties.getOsw().getContainerName());
-
         //Send message to the Queue
-        OswUploadMessage oswUploadmsg = OswUploadMapper.INSTANCE.fromOswUpload(meta);
-        oswUploadmsg.setFileUploadPath(fileUploadedPath);
-        oswUploadmsg.setUserId(userId);
-
+        OswUploadMessage oswUploadMessage = OswUploadMapper.INSTANCE.fromOswUpload(meta);
+        oswUploadMessage.setFileUploadPath(fileUploadedPath);
+        oswUploadMessage.setUserId(userId);
+        oswUploadMessage.setTdeiRecordId(tdeiUniqueRecordId);
 
         QueueMessage message = new QueueMessage();
         message.setMessageType("osw");
-        message.setMessage("New Data published for theOrganization:" + tdeiOrgId);
-        message.setData(oswUploadmsg);
-        eventBusService.sendMessage(message, applicationProperties.getGtfsPathways().getUploadTopicName());
-        return "Received the file, request is under process.";
+        message.setMessage("New Data published for the Organization:" + tdeiOrgId);
+        message.setData(oswUploadMessage);
+        eventBusService.sendMessage(message, applicationProperties.getOsw().getUploadTopicName());
+        return tdeiUniqueRecordId;
 
     }
 }
