@@ -22,6 +22,11 @@ public class GtfsFlexUpload {
     @JsonProperty("tdei_org_id")
     private String tdeiOrgId = null;
 
+    @Schema(required = true, description = "TDEI id of a GTFS Flex service")
+    @NotNull
+    @JsonProperty("tdei_service_id")
+    private String tdeiServiceId = null;
+
     @Schema(required = true, description = "Description of who data was collected by. See Best Practices document for information on how to format this string.")
     @NotNull
     @JsonProperty("collected_by")
