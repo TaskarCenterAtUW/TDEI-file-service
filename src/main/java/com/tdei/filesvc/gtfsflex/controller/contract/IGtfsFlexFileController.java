@@ -27,7 +27,7 @@ public interface IGtfsFlexFileController {
             @ApiResponse(responseCode = "500", description = "An server error occurred.", content = @Content)
     })
     @RequestMapping(value = "uploadFile",
-            produces = {"application/text"},
+            produces = {"*/*"},
             consumes = {"multipart/form-data"},
             method = RequestMethod.POST)
     ResponseEntity<String> uploadGtfsFlexFile(@RequestPart("meta") @Valid GtfsFlexUpload meta,
