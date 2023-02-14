@@ -28,7 +28,7 @@ public interface IOswFileController {
             @ApiResponse(responseCode = "500", description = "An server error occurred.", content = @Content)
     })
     @RequestMapping(value = "uploadFile",
-            produces = {"application/json"},
+            produces = {"*/*"},
             consumes = {"multipart/form-data"},
             method = RequestMethod.POST)
     ResponseEntity<String> uploadOswFile(@RequestPart("meta") @Valid OswUpload meta,
