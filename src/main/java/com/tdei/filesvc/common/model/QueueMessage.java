@@ -3,9 +3,14 @@ package com.tdei.filesvc.common.model;
 import lombok.Data;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Data
 public class QueueMessage {
+    /**
+     * Unique message id
+     */
+    private String messageId = UUID.randomUUID().toString();
     /**
      * Message type for this queue message
      */
@@ -20,7 +25,7 @@ public class QueueMessage {
     /**
      * Optional message string for the message
      */
-    private String message;
+    private String message = "";
 
     /**
      * Additional data that is related to the message
