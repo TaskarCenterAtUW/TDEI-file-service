@@ -51,6 +51,7 @@ public class OswStorageService implements IOswStorageService {
         //Send message to the Queue
         //Send message to the Queue
         UploadQueueMessage messageData = new UploadQueueMessage();
+        messageData.setStage("OSW-Upload");
         messageData.setRequest(uploadInputInfo);
         messageData.setUserId(userId);
         messageData.setOrgId(tdeiOrgId);
