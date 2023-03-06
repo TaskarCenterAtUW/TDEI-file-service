@@ -51,6 +51,7 @@ public class GtfsFlexStorageService implements IGtfsFlexStorageService {
         //Send message to the Queue
 
         UploadQueueMessage messageData = new UploadQueueMessage();
+        messageData.setStage("Flex-Upload");
         messageData.setRequest(flexUploadInput);
         messageData.setUserId(userId);
         messageData.setOrgId(tdeiOrgId);

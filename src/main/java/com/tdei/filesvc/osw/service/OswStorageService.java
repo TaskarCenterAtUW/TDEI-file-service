@@ -5,9 +5,9 @@ import com.tdei.filesvc.common.service.EventBusService;
 import com.tdei.filesvc.common.service.StorageService;
 import com.tdei.filesvc.core.config.ApplicationProperties;
 import com.tdei.filesvc.core.config.exception.handler.exceptions.FileExtensionNotAllowedException;
-import com.tdei.filesvc.gtfsflex.model.ResponseInfo;
-import com.tdei.filesvc.gtfsflex.model.UploadQueueMessage;
 import com.tdei.filesvc.osw.model.OswUpload;
+import com.tdei.filesvc.osw.model.ResponseInfo;
+import com.tdei.filesvc.osw.model.UploadQueueMessage;
 import com.tdei.filesvc.osw.service.contract.IOswStorageService;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
@@ -51,6 +51,7 @@ public class OswStorageService implements IOswStorageService {
         //Send message to the Queue
         //Send message to the Queue
         UploadQueueMessage messageData = new UploadQueueMessage();
+        messageData.setStage("OSW-Upload");
         messageData.setRequest(uploadInputInfo);
         messageData.setUserId(userId);
         messageData.setOrgId(tdeiOrgId);

@@ -50,6 +50,7 @@ public class GtfsPathwaysStorageService implements IGtfsPathwaysStorageService {
         String fileUploadedPath = storageService.uploadBlob(file, uploadPath, applicationProperties.getGtfsPathways().getContainerName());
         //Send message to the Queue
         UploadQueueMessage messageData = new UploadQueueMessage();
+        messageData.setStage("Pathways-Upload");
         messageData.setRequest(uploadInputInfo);
         messageData.setUserId(userId);
         messageData.setOrgId(tdeiOrgId);

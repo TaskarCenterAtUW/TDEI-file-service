@@ -14,7 +14,7 @@ public class UploadQueueMessage {
     private String orgId;
     @JsonProperty("user_id")
     private String userId;
-    private String stage = "Flex-Upload";
+    private String stage = "Upload";
     private Object request;
     private Map<String, String> meta;
     private ResponseInfo response;
