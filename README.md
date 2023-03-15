@@ -4,6 +4,33 @@ This is an API for file service operations for TDEI system. This API
 supports file uploads of GTFS-Pathways, GTFS-Flex v2 and OpenSidewalks
 data.
 
+### File Service workflow
+
+1. **Client**, makes the HTTP multipart call to the **Gateway API** for the specified file type.
+
+``` 
+Multipart request will contain two information, one file stream and other metadata information
+
+{ file : octate-stream }
+__________________________________
+{
+ metadata :
+   {
+      validFrom : XXXX,
+      validTo : XXXX
+      ....
+    }
+ }
+``` 
+
+2. Gateway service routes this request to File Service
+3. On API request file service will perform below job
+    1. Generate unique record id (unique id) for each job.
+    2. Retrieve the file stream and saves to the cloud storage under the specified file container ( folder)
+    3. Upon successful upload to the cloud storage, it keeps the reference of the uploaded file path
+    4. Compose new queue message with requested metadata and file upload path and publish to file specific topic
+    5. Finally return the generated record id back to Gateway service for further tracking of the request.
+
 ## System requirements
 
 | Software | Version |
