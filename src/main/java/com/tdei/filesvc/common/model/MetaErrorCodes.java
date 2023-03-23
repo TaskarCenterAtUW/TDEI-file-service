@@ -8,7 +8,11 @@ public enum MetaErrorCodes {
     NO_COLLECTION_METHOD(4003),
     INVALID_COLLECTION_METHOD(4004),
     NO_DATA_SOURCE(4005),
-    INVALID_DATA_SOURCE(4006);
+    INVALID_DATA_SOURCE(4006),
+
+    NO_FLEX_SCHEMA(4007),
+
+    INVALID_FLEX_SCHEMA(4008);
 
 
     private final int status;

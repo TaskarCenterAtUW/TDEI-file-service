@@ -10,4 +10,8 @@ public interface MetaErrorMessages {
     String NO_COLLECTION_DATE = "collection_date is invalid";
 
     String COLLECTED_BY_LENGTHY = "collected_by should be less than 50 characters";
+
+    String NO_FLEX_VERSION = "flex_schema_version not specified";
+
+    String INVALID_FLEX_VERSION = "invalid flex_schema_version. Valid one `v2.0`";
 }

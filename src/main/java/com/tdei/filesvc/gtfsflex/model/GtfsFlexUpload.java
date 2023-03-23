@@ -128,6 +128,14 @@ public class GtfsFlexUpload {
                 errors.add(invalidDatasourceError);
             }
         }
+        if(this.getFlexSchemaVersion() == null){
+            MetaValidationError noFlexSchemaError = new MetaValidationError(NO_FLEX_SCHEMA,MetaErrorMessages.NO_FLEX_VERSION);
+            errors.add(noFlexSchemaError);
+        }
+        else if(!this.getFlexSchemaVersion().equals("v2.0")){ // To be shifted to other service soon
+            MetaValidationError invalidFlexSchemaError = new MetaValidationError(INVALID_FLEX_SCHEMA,MetaErrorMessages.INVALID_FLEX_VERSION);
+            errors.add(invalidFlexSchemaError);
+        }
 
          return errors;
     }
