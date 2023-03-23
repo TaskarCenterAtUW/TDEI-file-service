@@ -14,4 +14,8 @@ public interface MetaErrorMessages {
     String NO_FLEX_VERSION = "flex_schema_version not specified";
 
     String INVALID_FLEX_VERSION = "invalid flex_schema_version. Valid one `v2.0`";
+
+    String NO_GTFS_PATHWAY_VERSION = "pathways_schema_version not specified";
+
+    String INVALID_GTFS_PATHWAY_VERSION = "invalid pathways_schema_version. Valid one `v1.0`";
 }
