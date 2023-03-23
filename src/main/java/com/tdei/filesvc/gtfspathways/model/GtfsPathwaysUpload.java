@@ -1,14 +1,15 @@
 package com.tdei.filesvc.gtfspathways.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.tdei.filesvc.common.model.Polygon;
+import com.tdei.filesvc.common.model.GeoJsonObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 /**
  * Describes a gtfs pathways file meta data. Same as gtfs_pathways, but adds uri.
@@ -36,7 +37,8 @@ public class GtfsPathwaysUpload {
     @NotNull
     @Valid
     @JsonProperty("collection_date")
-    private OffsetDateTime collectionDate = null;
+    @JsonFormat(shape = JsonFormat.Shape.ANY, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    private LocalDateTime collectionDate = null;
 
     @Schema(required = true, description = "Method by which the data was collected. See Best Practices document for information on how to format this string.")
     @NotNull
@@ -47,12 +49,14 @@ public class GtfsPathwaysUpload {
     @NotNull
     @Valid
     @JsonProperty("valid_from")
-    private OffsetDateTime validFrom = null;
+    @JsonFormat(shape = JsonFormat.Shape.ANY, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    private LocalDateTime validFrom = null;
 
     @Schema(description = "date until which this data is valid")
     @Valid
     @JsonProperty("valid_to")
-    private OffsetDateTime validTo = null;
+    @JsonFormat(shape = JsonFormat.Shape.ANY, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    private LocalDateTime validTo = null;
 
     @Schema(required = true, description = "Description of data source or sources from which the data was collected. See Best Practices document for information on how to format this string.")
     @NotNull
@@ -67,5 +71,5 @@ public class GtfsPathwaysUpload {
     @Schema(required = true, description = "")
     @NotNull
     @JsonProperty("polygon")
-    private Polygon polygon = null;
+    private GeoJsonObject polygon = null;
 }
