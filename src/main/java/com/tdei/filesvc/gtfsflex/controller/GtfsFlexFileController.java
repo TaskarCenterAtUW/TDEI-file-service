@@ -1,6 +1,7 @@
 package com.tdei.filesvc.gtfsflex.controller;
 
 import com.tdei.filesvc.common.model.MetaValidationError;
+import com.tdei.filesvc.core.config.exception.handler.exceptions.MetadataValidationException;
 import com.tdei.filesvc.gtfsflex.controller.contract.IGtfsFlexFileController;
 import com.tdei.filesvc.gtfsflex.model.GtfsFlexUpload;
 import com.tdei.filesvc.gtfsflex.service.GtfsFlexStorageService;
@@ -31,7 +32,7 @@ public class GtfsFlexFileController implements IGtfsFlexFileController {
         }
         else {
             // Send the validation errors
-            return  ResponseEntity.badRequest().build(); //TODO: change this
+            throw new MetadataValidationException("Error validating Metadata",metaValidationErrors);
         }
     }
 }

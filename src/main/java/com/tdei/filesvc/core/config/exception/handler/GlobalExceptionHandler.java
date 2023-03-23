@@ -1,9 +1,6 @@
 package com.tdei.filesvc.core.config.exception.handler;
 
-import com.tdei.filesvc.core.config.exception.handler.exceptions.FileExtensionNotAllowedException;
-import com.tdei.filesvc.core.config.exception.handler.exceptions.InvalidAccessTokenException;
-import com.tdei.filesvc.core.config.exception.handler.exceptions.InvalidCredentialsException;
-import com.tdei.filesvc.core.config.exception.handler.exceptions.ResourceNotFoundException;
+import com.tdei.filesvc.core.config.exception.handler.exceptions.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -158,6 +155,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         details.add(ex.getMessage());
 
         ApiError err = new ApiError(LocalDateTime.now(), HttpStatus.BAD_REQUEST, "File Type Not Supported", details);
+
+        return ResponseEntityBuilder.build(err);
+    }
+
+    @ExceptionHandler(MetadataValidationException.class)
+    public ResponseEntity<Object> handleMetadataValidationException(MetadataValidationException ex) {
+
+        List<String> errors = new ArrayList<>();
+        ex.getErrorList().forEach(x->{
+            errors.add(x.getMessage());
+        });
+
+        ApiError err = new ApiError(LocalDateTime.now(), HttpStatus.BAD_REQUEST, ex.getMessage(), errors);
 
         return ResponseEntityBuilder.build(err);
     }

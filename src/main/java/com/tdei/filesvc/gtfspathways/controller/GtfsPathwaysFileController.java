@@ -1,6 +1,7 @@
 package com.tdei.filesvc.gtfspathways.controller;
 
 import com.tdei.filesvc.common.model.MetaValidationError;
+import com.tdei.filesvc.core.config.exception.handler.exceptions.MetadataValidationException;
 import com.tdei.filesvc.gtfspathways.controller.contract.IGtfsPathwaysFileController;
 import com.tdei.filesvc.gtfspathways.model.GtfsPathwaysUpload;
 import com.tdei.filesvc.gtfspathways.service.GtfsPathwaysStorageService;
@@ -30,7 +31,7 @@ public class GtfsPathwaysFileController implements IGtfsPathwaysFileController {
             return ResponseEntity.ok(storageService.uploadBlob(meta, tdeiOrgId, userId, file));
         }
         else {
-            return ResponseEntity.badRequest().build();//TODO: Change this
+           throw  new MetadataValidationException("Error validating metadata",errorList);
         }
     }
 
