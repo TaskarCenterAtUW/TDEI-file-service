@@ -86,10 +86,14 @@ class GtfsFlexTests {
         props.setGtfsFlex(gtfsFlexProperties);
 
         String orgId = "101";
+        GtfsFlexUpload upload = new GtfsFlexUpload();
+        upload.setCollectedBy("morethan50chars");
+        boolean isMetaValid = upload.isMetadataValidated();
+        assertThat(isMetaValid).isTrue();
         when(storageService.uploadBlob(any(MockMultipartFile.class), anyString(), anyString())).thenReturn("success");
         when(applicationProperties.getGtfsFlex()).thenReturn(props.getGtfsFlex());
         doNothing().when(eventBusService).sendMessage(any(QueueMessage.class), anyString());
-        var result = gtfsFlexStorageServiceInjectMock.uploadBlob(new GtfsFlexUpload(), orgId, "2039-2829", file);
+        var result = gtfsFlexStorageServiceInjectMock.uploadBlob(upload, orgId, "2039-2829", file);
 
         assertThat(result).isNotBlank();
     }

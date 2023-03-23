@@ -28,7 +28,7 @@ public class GtfsFlexUpload {
     @JsonProperty("tdei_service_id")
     private String tdeiServiceId = null;
 
-    @Schema(required = true, description = "Description of who data was collected by. See Best Practices document for information on how to format this string.")
+    @Schema(required = true,description = "Description of who data was collected by. See Best Practices document for information on how to format this string.")
     @NotNull
     @JsonProperty("collected_by")
     private String collectedBy = null;
@@ -72,4 +72,8 @@ public class GtfsFlexUpload {
     @NotNull
     @JsonProperty("flex_schema_version")
     private String flexSchemaVersion = null;
+
+    public boolean isMetadataValidated(){
+        return this.getCollectedBy().length() <= 50;
+    }
 }
