@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -32,7 +32,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
         assertThat(invalidDateError.getErrorName()).isEqualTo("Invalid format");
 
         // Assert for future dates in collection date
-        upload.setCollectionDate(OffsetDateTime.now().plusHours(2));
+        upload.setCollectionDate(LocalDateTime.now().plusHours(2));
         List<MetaValidationError> metaErrors = upload.isMetadataValidated();
         assertThat(metaErrors.size()).isNotEqualTo(0);
         MetaValidationError futureError = metaErrors.get(0);
@@ -43,7 +43,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
     void testCollectionMethod() {
         GtfsFlexUpload upload = new GtfsFlexUpload();
         upload.setCollectedBy("collectedBy");
-        upload.setCollectionDate(OffsetDateTime.now());
+        upload.setCollectionDate(LocalDateTime.now());
         // No collection_method
         List<MetaValidationError> errors = upload.isMetadataValidated();
         assertThat(errors.size()).isEqualTo(1);
@@ -63,7 +63,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
     void testDataSource(){
         GtfsFlexUpload upload = new GtfsFlexUpload();
         upload.setCollectedBy("collectedBy");
-        upload.setCollectionDate(OffsetDateTime.now());
+        upload.setCollectionDate(LocalDateTime.now());
         upload.setCollectionMethod("other");
 
 

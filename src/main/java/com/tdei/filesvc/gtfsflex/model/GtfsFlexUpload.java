@@ -3,11 +3,8 @@ package com.tdei.filesvc.gtfsflex.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tdei.filesvc.common.model.GeoJsonObject;
-import com.ctc.wstx.util.StringUtil;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tdei.filesvc.common.model.MetaErrorMessages;
 import com.tdei.filesvc.common.model.MetaValidationError;
-import com.tdei.filesvc.common.model.Polygon;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
@@ -15,7 +12,6 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,7 +92,7 @@ public class GtfsFlexUpload {
             MetaValidationError collectionDateError = new MetaValidationError(NO_COLLECTION_DATE,MetaErrorMessages.NO_COLLECTION_DATE);
             errors.add(collectionDateError);
         }
-       else if(this.getCollectionDate().isAfter(OffsetDateTime.now())){
+       else if(this.getCollectionDate().isAfter(LocalDateTime.now())){
             // Cannot be future date
             MetaValidationError collectionDateError = new MetaValidationError(COLLECTION_DATE_FUTURE,MetaErrorMessages.COLLECTION_DATE_FUTURE);
             errors.add(collectionDateError);
