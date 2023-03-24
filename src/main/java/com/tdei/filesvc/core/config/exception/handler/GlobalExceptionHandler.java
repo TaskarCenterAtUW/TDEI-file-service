@@ -164,7 +164,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         List<String> errors = new ArrayList<>();
         ex.getErrorList().forEach(x->{
-            errors.add(x.getMessage());
+            errors.add(x.getErrorDescription());
         });
 
         ApiError err = new ApiError(LocalDateTime.now(), HttpStatus.BAD_REQUEST, ex.getMessage(), errors);
