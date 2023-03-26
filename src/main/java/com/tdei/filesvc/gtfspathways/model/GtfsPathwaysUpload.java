@@ -3,6 +3,8 @@ package com.tdei.filesvc.gtfspathways.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tdei.filesvc.common.model.GeoJsonObject;
+import com.tdei.filesvc.common.model.MetaErrorMessages;
+import com.tdei.filesvc.common.model.MetaValidationError;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
@@ -10,6 +12,10 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.tdei.filesvc.common.model.MetaErrorCodes.*;
 
 /**
  * Describes a gtfs pathways file meta data. Same as gtfs_pathways, but adds uri.
@@ -72,4 +78,65 @@ public class GtfsPathwaysUpload {
     @NotNull
     @JsonProperty("polygon")
     private GeoJsonObject polygon = null;
+
+    public List<MetaValidationError> isMetadataValidated(){
+        ArrayList<MetaValidationError> errors = new ArrayList<>();
+
+        // Collected By
+        if(this.getCollectedBy().length() > 50){
+            MetaValidationError collectedByError = new MetaValidationError(INVALID_COLLECTEDBY_LENGTH, MetaErrorMessages.COLLECTED_BY_LENGTHY);//new MetaValidationError("Invalid length","collected_by should be less than 50 characters");
+            errors.add(collectedByError);
+        }
+        // Collection date
+        if(this.getCollectionDate() == null){
+            MetaValidationError collectionDateError = new MetaValidationError(NO_COLLECTION_DATE,MetaErrorMessages.NO_COLLECTION_DATE);
+            errors.add(collectionDateError);
+        }
+        else if(this.getCollectionDate().isAfter(LocalDateTime.now())){
+            // Cannot be future date
+            MetaValidationError collectionDateError = new MetaValidationError(COLLECTION_DATE_FUTURE,MetaErrorMessages.COLLECTION_DATE_FUTURE);
+            errors.add(collectionDateError);
+        }
+
+        // Collection method
+        if(this.getCollectionMethod() == null){
+            MetaValidationError collectionMethodError = new MetaValidationError(NO_COLLECTION_METHOD,MetaErrorMessages.INVALID_COLLECTION_METHOD);
+            errors.add(collectionMethodError);
+        }
+        else {
+            String collectionMethodLowerCase = this.getCollectionMethod().toLowerCase();
+            List<String> validCollectionMethods = new ArrayList<>(
+                    List.of("manual",
+                            "transform",
+                            "generated",
+                            "other"));
+            if(!validCollectionMethods.contains(collectionMethodLowerCase)){
+                MetaValidationError invalidCollectionMethodError = new MetaValidationError(INVALID_COLLECTION_METHOD,MetaErrorMessages.INVALID_COLLECTION_METHOD);
+                errors.add(invalidCollectionMethodError);
+            }
+        }
+
+        // Data source
+        if(this.getDataSource() == null){
+            MetaValidationError datasourceError = new MetaValidationError(NO_DATA_SOURCE,MetaErrorMessages.INVALID_DATA_SOURCE);
+            errors.add(datasourceError);
+        }
+        else {
+            List<String> validDataSource = new ArrayList<>(List.of("3rdParty","TDEITools","InHouse"));
+            if(!validDataSource.contains(this.getDataSource())){
+                MetaValidationError invalidDatasourceError = new MetaValidationError(INVALID_DATA_SOURCE,MetaErrorMessages.INVALID_DATA_SOURCE);
+                errors.add(invalidDatasourceError);
+            }
+        }
+        if(this.getPathwaysSchemaVersion() == null){
+            MetaValidationError noFlexSchemaError = new MetaValidationError(NO_GTFS_PATHWAY_SCHEMA,MetaErrorMessages.NO_GTFS_PATHWAY_VERSION);
+            errors.add(noFlexSchemaError);
+        }
+        else if(!this.getPathwaysSchemaVersion().equals("v1.0")){ // To be shifted to other service soon
+            MetaValidationError invalidFlexSchemaError = new MetaValidationError(INVALID_GTFS_PATHWAY_SCHEMA,MetaErrorMessages.INVALID_GTFS_PATHWAY_VERSION);
+            errors.add(invalidFlexSchemaError);
+        }
+
+        return errors;
+    }
 }

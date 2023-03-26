@@ -1,5 +1,7 @@
 package com.tdei.filesvc.gtfspathways.controller;
 
+import com.tdei.filesvc.common.model.MetaValidationError;
+import com.tdei.filesvc.core.config.exception.handler.exceptions.MetadataValidationException;
 import com.tdei.filesvc.gtfspathways.controller.contract.IGtfsPathwaysFileController;
 import com.tdei.filesvc.gtfspathways.model.GtfsPathwaysUpload;
 import com.tdei.filesvc.gtfspathways.service.GtfsPathwaysStorageService;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,7 +26,13 @@ public class GtfsPathwaysFileController implements IGtfsPathwaysFileController {
 
     @Override
     public ResponseEntity<String> uploadGtfsPathwaysFile(GtfsPathwaysUpload meta, String tdeiOrgId, String userId, MultipartFile file, HttpServletRequest httpServletRequest) throws FileUploadException {
-        return ResponseEntity.ok(storageService.uploadBlob(meta, tdeiOrgId, userId, file));
+        List<MetaValidationError> errorList  = meta.isMetadataValidated();
+        if(errorList.isEmpty()) {
+            return ResponseEntity.ok(storageService.uploadBlob(meta, tdeiOrgId, userId, file));
+        }
+        else {
+           throw  new MetadataValidationException("Error validating metadata",errorList);
+        }
     }
 
 }

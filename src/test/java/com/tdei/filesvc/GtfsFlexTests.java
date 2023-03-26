@@ -86,6 +86,7 @@ class GtfsFlexTests {
         props.setGtfsFlex(gtfsFlexProperties);
 
         String orgId = "101";
+
         when(storageService.uploadBlob(any(MockMultipartFile.class), anyString(), anyString())).thenReturn("success");
         when(applicationProperties.getGtfsFlex()).thenReturn(props.getGtfsFlex());
         doNothing().when(eventBusService).sendMessage(any(QueueMessage.class), anyString());
