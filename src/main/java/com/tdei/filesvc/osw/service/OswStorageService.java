@@ -5,9 +5,9 @@ import com.tdei.filesvc.common.service.EventBusService;
 import com.tdei.filesvc.common.service.StorageService;
 import com.tdei.filesvc.core.config.ApplicationProperties;
 import com.tdei.filesvc.core.config.exception.handler.exceptions.FileExtensionNotAllowedException;
-import com.tdei.filesvc.osw.mapper.OswUploadMapper;
 import com.tdei.filesvc.osw.model.OswUpload;
-import com.tdei.filesvc.osw.model.OswUploadMessage;
+import com.tdei.filesvc.osw.model.ResponseInfo;
+import com.tdei.filesvc.osw.model.UploadQueueMessage;
 import com.tdei.filesvc.osw.service.contract.IOswStorageService;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
@@ -15,9 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static com.tdei.filesvc.common.utils.Utility.getExtensionByStringHandling;
 
@@ -29,7 +27,7 @@ public class OswStorageService implements IOswStorageService {
     private final ApplicationProperties applicationProperties;
 
     @Override
-    public String uploadBlob(OswUpload meta, String tdeiOrgId, String userId, MultipartFile file) throws FileUploadException {
+    public String uploadBlob(OswUpload uploadInputInfo, String tdeiOrgId, String userId, MultipartFile file) throws FileUploadException {
         String tdeiUniqueRecordId = UUID.randomUUID().toString().replace("-", "");
         String fileExtension = getExtensionByStringHandling(file.getOriginalFilename()).get();
         List<String> allowedExtensions = Arrays.stream(applicationProperties.getOsw().getUploadAllowedExtensions().split(",")).toList();
@@ -51,17 +49,27 @@ public class OswStorageService implements IOswStorageService {
 
         String fileUploadedPath = storageService.uploadBlob(file, uploadPath, applicationProperties.getOsw().getContainerName());
         //Send message to the Queue
-        OswUploadMessage oswUploadMessage = OswUploadMapper.INSTANCE.fromOswUpload(meta);
-        oswUploadMessage.setFileUploadPath(fileUploadedPath);
-        oswUploadMessage.setUserId(userId);
-        oswUploadMessage.setTdeiRecordId(tdeiUniqueRecordId);
+        //Send message to the Queue
+        UploadQueueMessage messageData = new UploadQueueMessage();
+        messageData.setStage("OSW-Upload");
+        messageData.setRequest(uploadInputInfo);
+        messageData.setUserId(userId);
+        messageData.setOrgId(tdeiOrgId);
+        messageData.setTdeiRecordId(tdeiUniqueRecordId);
+        //Set meta information
+        Map<String, String> metaInfo = new HashMap<>();
+        metaInfo.put("file_upload_path", fileUploadedPath);
+        messageData.setMeta(metaInfo);
+
+        messageData.setResponse(new ResponseInfo(
+                true,
+                "File uploaded for the Organization : " + tdeiOrgId + " with tdei record id : " + tdeiUniqueRecordId
+        ));
 
         QueueMessage message = new QueueMessage();
-        message.setMessageType("osw");
-        message.setMessage("New Data published for the Organization:" + tdeiOrgId);
-        message.setData(oswUploadMessage);
+        message.setData(messageData);
+
         eventBusService.sendMessage(message, applicationProperties.getOsw().getUploadTopicName());
         return tdeiUniqueRecordId;
-
     }
 }

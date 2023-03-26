@@ -1,18 +1,19 @@
 package com.tdei.filesvc.common.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import lombok.Data;
 
 import javax.validation.Valid;
 import java.util.List;
 
 @Data
-public class Polygon {
+public class Geometry {
     @JsonProperty("type")
-    @Valid
     private String type = null;
 
-    @JsonProperty("features")
+    @JsonProperty("coordinates")
     @Valid
-    private List<PolygonFeatures> features = null;
+    @ArraySchema(minItems = 4)
+    private List<List<List<Double>>> coordinates = null;
 }

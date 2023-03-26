@@ -5,9 +5,9 @@ import com.tdei.filesvc.common.service.EventBusService;
 import com.tdei.filesvc.common.service.StorageService;
 import com.tdei.filesvc.core.config.ApplicationProperties;
 import com.tdei.filesvc.core.config.exception.handler.exceptions.FileExtensionNotAllowedException;
-import com.tdei.filesvc.gtfspathways.mapper.GtfsPathwaysUploadMapper;
 import com.tdei.filesvc.gtfspathways.model.GtfsPathwaysUpload;
-import com.tdei.filesvc.gtfspathways.model.GtfsPathwaysUploadMessage;
+import com.tdei.filesvc.gtfspathways.model.ResponseInfo;
+import com.tdei.filesvc.gtfspathways.model.UploadQueueMessage;
 import com.tdei.filesvc.gtfspathways.service.contract.IGtfsPathwaysStorageService;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
@@ -15,9 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static com.tdei.filesvc.common.utils.Utility.getExtensionByStringHandling;
 
@@ -29,7 +27,7 @@ public class GtfsPathwaysStorageService implements IGtfsPathwaysStorageService {
     private final ApplicationProperties applicationProperties;
 
     @Override
-    public String uploadBlob(GtfsPathwaysUpload meta, String tdeiOrgId, String userId, MultipartFile file) throws FileUploadException {
+    public String uploadBlob(GtfsPathwaysUpload uploadInputInfo, String tdeiOrgId, String userId, MultipartFile file) throws FileUploadException {
         String tdeiUniqueRecordId = UUID.randomUUID().toString().replace("-", "");
         String fileExtension = getExtensionByStringHandling(file.getOriginalFilename()).get();
         List<String> allowedExtensions = Arrays.stream(applicationProperties.getGtfsPathways().getUploadAllowedExtensions().split(",")).toList();
@@ -51,15 +49,26 @@ public class GtfsPathwaysStorageService implements IGtfsPathwaysStorageService {
 
         String fileUploadedPath = storageService.uploadBlob(file, uploadPath, applicationProperties.getGtfsPathways().getContainerName());
         //Send message to the Queue
-        GtfsPathwaysUploadMessage gtfsPathwaysMessge = GtfsPathwaysUploadMapper.INSTANCE.fromGtfsPathwaysUpload(meta);
-        gtfsPathwaysMessge.setFileUploadPath(fileUploadedPath);
-        gtfsPathwaysMessge.setUserId(userId);
-        gtfsPathwaysMessge.setTdeiRecordId(tdeiUniqueRecordId);
+        UploadQueueMessage messageData = new UploadQueueMessage();
+        messageData.setStage("Pathways-Upload");
+        messageData.setRequest(uploadInputInfo);
+        messageData.setUserId(userId);
+        messageData.setOrgId(tdeiOrgId);
+        messageData.setTdeiRecordId(tdeiUniqueRecordId);
+        //Set meta information
+        Map<String, String> metaInfo = new HashMap<>();
+        metaInfo.put("file_upload_path", fileUploadedPath);
+        messageData.setMeta(metaInfo);
+
+        messageData.setResponse(new ResponseInfo(
+                true,
+                "File uploaded for the Organization : " + tdeiOrgId + " with tdei record id : " + tdeiUniqueRecordId
+        ));
 
         QueueMessage message = new QueueMessage();
-        message.setMessageType("gtfspathways");
-        message.setMessage("New Data published for the Organization:" + tdeiOrgId);
-        message.setData(gtfsPathwaysMessge);
+        message.setMessageType("gtfs-pathways-upload");
+        message.setData(messageData);
+
         eventBusService.sendMessage(message, applicationProperties.getGtfsPathways().getUploadTopicName());
         return tdeiUniqueRecordId;
 
