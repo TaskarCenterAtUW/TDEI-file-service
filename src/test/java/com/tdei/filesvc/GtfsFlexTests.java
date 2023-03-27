@@ -49,6 +49,7 @@ class GtfsFlexTests {
     void uploadFlexFileController() throws FileUploadException {
 
         Principal mockPrincipal = mock(Principal.class);
+        GtfsFlexUpload mockGtfsFlexUpload = mock(GtfsFlexUpload.class);
         MockMultipartFile file
                 = new MockMultipartFile(
                 "file",
@@ -60,7 +61,7 @@ class GtfsFlexTests {
 
         String orgId = "101";
         when(gtfsFlexStorageService.uploadBlob(any(GtfsFlexUpload.class), anyString(), anyString(), any(MockMultipartFile.class))).thenReturn("success");
-        var result = gtfsFlexFileController.uploadGtfsFlexFile(new GtfsFlexUpload(), orgId, "2039-2829", file, request);
+        var result = gtfsFlexFileController.uploadGtfsFlexFile(mockGtfsFlexUpload, orgId, "2039-2829", file, request);
 
         assertThat(result.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(result.getBody()).isEqualTo("success");

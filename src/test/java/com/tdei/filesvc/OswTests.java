@@ -4,9 +4,9 @@ import com.tdei.filesvc.common.model.QueueMessage;
 import com.tdei.filesvc.common.service.EventBusService;
 import com.tdei.filesvc.common.service.StorageService;
 import com.tdei.filesvc.core.config.ApplicationProperties;
-import com.tdei.filesvc.gtfspathways.controller.GtfsPathwaysFileController;
-import com.tdei.filesvc.gtfspathways.model.GtfsPathwaysUpload;
-import com.tdei.filesvc.gtfspathways.service.GtfsPathwaysStorageService;
+import com.tdei.filesvc.osw.controller.OswFileController;
+import com.tdei.filesvc.osw.model.OswUpload;
+import com.tdei.filesvc.osw.service.OswStorageService;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +20,7 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import java.security.Principal;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 class OswTests {
 
     @Mock
-    private GtfsPathwaysStorageService gtfsPathwaysStorageService;
+    private OswStorageService oswStorageServiceMock;
     @Mock
     private EventBusService eventBusService;
 
@@ -37,13 +37,13 @@ class OswTests {
     private ApplicationProperties applicationProperties;
 
     @InjectMocks
-    private GtfsPathwaysStorageService gtfsPathwaysStorageServiceInjectMock;
+    private OswStorageService oswStorageServiceInjectMock;
 
     @Mock
     private StorageService storageService;
 
     @InjectMocks
-    private GtfsPathwaysFileController gtfsPathwaysFileController;
+    private OswFileController oswFileController;
 
     @Test
     void uploadPathwaysFileController() throws FileUploadException {
@@ -59,8 +59,8 @@ class OswTests {
         MockHttpServletRequest request = new MockHttpServletRequest();
 
         String orgId = "101";
-        when(gtfsPathwaysStorageService.uploadBlob(any(GtfsPathwaysUpload.class), anyString(), anyString(), any(MockMultipartFile.class))).thenReturn("success");
-        var result = gtfsPathwaysFileController.uploadGtfsPathwaysFile(new GtfsPathwaysUpload(), orgId, "2039-2829", file, request);
+        when(oswStorageServiceMock.uploadBlob(any(OswUpload.class), anyString(), anyString(), any(MockMultipartFile.class))).thenReturn("success");
+        var result = oswFileController.uploadOswFile(new OswUpload(), orgId, "2039-2829", file, request);
 
         assertThat(result.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(result.getBody()).isEqualTo("success");
@@ -79,17 +79,17 @@ class OswTests {
         );
         MockHttpServletRequest request = new MockHttpServletRequest();
         ApplicationProperties props = new ApplicationProperties();
-        var gtfsPathwaysProperties = new ApplicationProperties.GtfsPathwaysProperties();
-        gtfsPathwaysProperties.setUploadAllowedExtensions("zip");
-        gtfsPathwaysProperties.setContainerName("gtfs-pathways");
-        gtfsPathwaysProperties.setUploadTopicName("uploaded");
-        props.setGtfsPathways(gtfsPathwaysProperties);
+        var oswProperties = new ApplicationProperties.OswProperties();
+        oswProperties.setUploadAllowedExtensions("zip");
+        oswProperties.setContainerName("osw");
+        oswProperties.setUploadTopicName("uploaded");
+        props.setOsw(oswProperties);
 
         String orgId = "101";
         when(storageService.uploadBlob(any(MockMultipartFile.class), anyString(), anyString())).thenReturn("success");
-        when(applicationProperties.getGtfsPathways()).thenReturn(props.getGtfsPathways());
+        when(applicationProperties.getOsw()).thenReturn(props.getOsw());
         doNothing().when(eventBusService).sendMessage(any(QueueMessage.class), anyString());
-        var result = gtfsPathwaysStorageServiceInjectMock.uploadBlob(new GtfsPathwaysUpload(), orgId, "2039-2829", file);
+        var result = oswStorageServiceInjectMock.uploadBlob(new OswUpload(), orgId, "2039-2829", file);
 
         assertThat(result).isNotBlank();
     }
