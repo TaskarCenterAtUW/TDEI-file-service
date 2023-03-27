@@ -49,6 +49,7 @@ class GtfsPathwaysTests {
     void uploadPathwaysFileController() throws FileUploadException {
 
         Principal mockPrincipal = mock(Principal.class);
+        GtfsPathwaysUpload mockGtfsPathwaysUpload = mock(GtfsPathwaysUpload.class);
         MockMultipartFile file
                 = new MockMultipartFile(
                 "file",
@@ -60,7 +61,7 @@ class GtfsPathwaysTests {
 
         String orgId = "101";
         when(gtfsPathwaysStorageService.uploadBlob(any(GtfsPathwaysUpload.class), anyString(), anyString(), any(MockMultipartFile.class))).thenReturn("success");
-        var result = gtfsPathwaysFileController.uploadGtfsPathwaysFile(new GtfsPathwaysUpload(), orgId, "2039-2829", file, request);
+        var result = gtfsPathwaysFileController.uploadGtfsPathwaysFile(mockGtfsPathwaysUpload, orgId, "2039-2829", file, request);
 
         assertThat(result.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
         assertThat(result.getBody()).isEqualTo("success");

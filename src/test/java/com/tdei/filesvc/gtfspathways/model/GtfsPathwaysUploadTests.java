@@ -14,7 +14,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @ExtendWith(MockitoExtension.class)
 public class GtfsPathwaysUploadTests {
     @Test
-    void testCollectedBy(){
+    void testCollectedBy() {
         GtfsPathwaysUpload upload = new GtfsPathwaysUpload();
         upload.setCollectedBy("morethan50charsmorethan50charsmorethan50charsmorethan50charsmorethan50charsmorethan50chars");
         List<MetaValidationError> errors = upload.isMetadataValidated();
@@ -24,7 +24,7 @@ public class GtfsPathwaysUploadTests {
     }
 
     @Test
-    void testCollectionDate(){
+    void testCollectionDate() {
         GtfsPathwaysUpload upload = new GtfsPathwaysUpload();
         upload.setCollectedBy("collectedBy");
         List<MetaValidationError> errors = upload.isMetadataValidated();
@@ -34,7 +34,7 @@ public class GtfsPathwaysUploadTests {
         assertThat(invalidDateError.getCode()).isEqualTo(NO_COLLECTION_DATE);
 
         // Assert for future dates in collection date
-        upload.setCollectionDate(LocalDateTime.now().plusHours(2));
+        upload.setCollectionDate(LocalDateTime.now().plusHours(2).toString());
         List<MetaValidationError> metaErrors = upload.isMetadataValidated();
         assertThat(metaErrors.size()).isNotEqualTo(0);
         MetaValidationError futureError = metaErrors.get(0);
@@ -45,7 +45,7 @@ public class GtfsPathwaysUploadTests {
     void testCollectionMethod() {
         GtfsPathwaysUpload upload = new GtfsPathwaysUpload();
         upload.setCollectedBy("collectedBy");
-        upload.setCollectionDate(LocalDateTime.now());
+        upload.setCollectionDate(LocalDateTime.now().toString());
         upload.setDataSource("3rdParty");
         upload.setPathwaysSchemaVersion("v1.0");
         // No collection_method
@@ -68,10 +68,10 @@ public class GtfsPathwaysUploadTests {
     }
 
     @Test
-    void testDataSource(){
+    void testDataSource() {
         GtfsPathwaysUpload upload = new GtfsPathwaysUpload();
         upload.setCollectedBy("collectedBy");
-        upload.setCollectionDate(LocalDateTime.now());
+        upload.setCollectionDate(LocalDateTime.now().toString());
         upload.setCollectionMethod("other");
         upload.setPathwaysSchemaVersion("v1.0");
         List<MetaValidationError> errors = upload.isMetadataValidated();
@@ -93,10 +93,10 @@ public class GtfsPathwaysUploadTests {
 
 
     @Test
-    void testVersionSchema(){
+    void testVersionSchema() {
         GtfsPathwaysUpload upload = new GtfsPathwaysUpload();
         upload.setCollectedBy("collectedBy");
-        upload.setCollectionDate(LocalDateTime.now());
+        upload.setCollectionDate(LocalDateTime.now().toString());
         upload.setCollectionMethod("other");
         upload.setDataSource("3rdParty");
         List<MetaValidationError> errors = upload.isMetadataValidated();

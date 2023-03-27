@@ -8,6 +8,7 @@ public interface MetaErrorMessages {
     String COLLECTION_DATE_FUTURE = "collection_date cannot be future";
 
     String NO_COLLECTION_DATE = "collection_date is invalid";
+    String NO_COLLECTED_BY = "collected_by is invalid";
 
     String COLLECTED_BY_LENGTHY = "collected_by should be less than 50 characters";
 

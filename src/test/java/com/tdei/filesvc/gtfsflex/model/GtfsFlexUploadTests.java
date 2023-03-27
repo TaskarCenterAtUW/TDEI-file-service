@@ -1,6 +1,5 @@
 package com.tdei.filesvc.gtfsflex.model;
 
-import com.tdei.filesvc.common.model.MetaErrorCodes;
 import com.tdei.filesvc.common.model.MetaValidationError;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,10 +12,10 @@ import static com.tdei.filesvc.common.model.MetaErrorCodes.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(MockitoExtension.class)
- class GtfsFlexUploadTests {
+class GtfsFlexUploadTests {
 
     @Test
-    void testCollectedBy(){
+    void testCollectedBy() {
         GtfsFlexUpload upload = new GtfsFlexUpload();
         upload.setCollectedBy("morethan50charsmorethan50charsmorethan50charsmorethan50charsmorethan50charsmorethan50chars");
         List<MetaValidationError> errors = upload.isMetadataValidated();
@@ -26,7 +25,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
     }
 
     @Test
-    void testCollectionDate(){
+    void testCollectionDate() {
         GtfsFlexUpload upload = new GtfsFlexUpload();
         upload.setCollectedBy("collectedBy");
         List<MetaValidationError> errors = upload.isMetadataValidated();
@@ -36,7 +35,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
         assertThat(invalidDateError.getCode()).isEqualTo(NO_COLLECTION_DATE);
 
         // Assert for future dates in collection date
-        upload.setCollectionDate(LocalDateTime.now().plusHours(2));
+        upload.setCollectionDate(LocalDateTime.now().plusHours(2).toString());
         List<MetaValidationError> metaErrors = upload.isMetadataValidated();
         assertThat(metaErrors.size()).isNotEqualTo(0);
         MetaValidationError futureError = metaErrors.get(0);
@@ -47,7 +46,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
     void testCollectionMethod() {
         GtfsFlexUpload upload = new GtfsFlexUpload();
         upload.setCollectedBy("collectedBy");
-        upload.setCollectionDate(LocalDateTime.now());
+        upload.setCollectionDate(LocalDateTime.now().toString());
         upload.setDataSource("3rdParty");
         upload.setFlexSchemaVersion("v2.0");
         // No collection_method
@@ -70,10 +69,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
     }
 
     @Test
-    void testDataSource(){
+    void testDataSource() {
         GtfsFlexUpload upload = new GtfsFlexUpload();
         upload.setCollectedBy("collectedBy");
-        upload.setCollectionDate(LocalDateTime.now());
+        upload.setCollectionDate(LocalDateTime.now().toString());
         upload.setCollectionMethod("other");
         upload.setFlexSchemaVersion("v2.0");
         List<MetaValidationError> errors = upload.isMetadataValidated();
@@ -95,10 +94,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 
     @Test
-    void testVersionSchema(){
+    void testVersionSchema() {
         GtfsFlexUpload upload = new GtfsFlexUpload();
         upload.setCollectedBy("collectedBy");
-        upload.setCollectionDate(LocalDateTime.now());
+        upload.setCollectionDate(LocalDateTime.now().toString());
         upload.setCollectionMethod("other");
         upload.setDataSource("3rdParty");
         List<MetaValidationError> errors = upload.isMetadataValidated();
@@ -118,7 +117,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 
     }
-
 
 
 }

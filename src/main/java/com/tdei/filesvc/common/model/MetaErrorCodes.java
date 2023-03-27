@@ -13,12 +13,13 @@ public enum MetaErrorCodes {
     NO_FLEX_SCHEMA(4007),
 
     INVALID_FLEX_SCHEMA(4008),
+    NO_COLLECTED_BY(4009),
 
     NO_GTFS_PATHWAY_SCHEMA(6001),
-    INVALID_GTFS_PATHWAY_SCHEMA(6002)
-    ;
+    INVALID_GTFS_PATHWAY_SCHEMA(6002);
 
     private final int status;
+
     MetaErrorCodes(int status) {
         this.status = status;
     }
