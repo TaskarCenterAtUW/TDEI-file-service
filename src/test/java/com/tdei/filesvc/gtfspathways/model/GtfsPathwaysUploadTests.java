@@ -26,6 +26,9 @@ public class GtfsPathwaysUploadTests {
     @Test
     void testCollectionDate() {
         GtfsPathwaysUpload upload = new GtfsPathwaysUpload();
+        upload.setDataSource("3rdParty");
+        upload.setPathwaysSchemaVersion("v1.0");
+        upload.setCollectionMethod("other");
         upload.setCollectedBy("collectedBy");
         List<MetaValidationError> errors = upload.isMetadataValidated();
         assertThat(errors.size()).isNotEqualTo(0);
@@ -33,19 +36,51 @@ public class GtfsPathwaysUploadTests {
         MetaValidationError invalidDateError = errors.get(0);
         assertThat(invalidDateError.getCode()).isEqualTo(NO_COLLECTION_DATE);
 
-        // Assert for future dates in collection date
-        upload.setCollectionDate(LocalDateTime.now().plusHours(2).toString());
+        upload.setCollectionDate("2023-03-02T04:22");
+        //2023-03-02T04:22:42.493Z // Correct time zone
+        List<MetaValidationError> malformedErrors = upload.isMetadataValidated();
+        assertThat(malformedErrors.size()).isNotEqualTo(0);
+        MetaValidationError malformedError = malformedErrors.get(0);
+        assertThat(malformedError.getCode()).isEqualTo(MALFORMED_COLLECTION_DATE);
+
+        // Future date with offset (timezone)
+        upload.setCollectionDate("2024-04-29T10:30:00+05:30");
         List<MetaValidationError> metaErrors = upload.isMetadataValidated();
         assertThat(metaErrors.size()).isNotEqualTo(0);
         MetaValidationError futureError = metaErrors.get(0);
         assertThat(futureError.getCode()).isEqualTo(COLLECTION_DATE_FUTURE);
+
+        //Future date with UTC timezone
+        upload.setCollectionDate("2024-04-29T10:30:00+05:30");
+        List<MetaValidationError> utcFutureErrors = upload.isMetadataValidated();
+        assertThat(utcFutureErrors.size()).isNotEqualTo(0);
+        MetaValidationError utcFutureError = utcFutureErrors.get(0);
+        assertThat(utcFutureError.getCode()).isEqualTo(COLLECTION_DATE_FUTURE);
+
+        // Valid ones
+        // Past date with timezone
+        upload.setCollectionDate("2023-03-29T10:30:00+05:30");
+        List<MetaValidationError> noErrors = upload.isMetadataValidated();
+        assertThat(noErrors.size()).isEqualTo(0);
+
+        // Past date with UTC
+        upload.setCollectionDate("2023-03-02T04:22:42.493Z");
+        List<MetaValidationError> utcNoErrors = upload.isMetadataValidated();
+        assertThat(utcNoErrors.size()).isEqualTo(0);
+
+//        // Assert for future dates in collection date
+//        upload.setCollectionDate(LocalDateTime.now().plusHours(2).toString());
+//        List<MetaValidationError> metaErrors = upload.isMetadataValidated();
+//        assertThat(metaErrors.size()).isNotEqualTo(0);
+//        MetaValidationError futureError = metaErrors.get(0);
+//        assertThat(futureError.getCode()).isEqualTo(COLLECTION_DATE_FUTURE);
     }
 
     @Test
     void testCollectionMethod() {
         GtfsPathwaysUpload upload = new GtfsPathwaysUpload();
         upload.setCollectedBy("collectedBy");
-        upload.setCollectionDate(LocalDateTime.now().toString());
+        upload.setCollectionDate("2023-03-02T04:22:42.493Z");
         upload.setDataSource("3rdParty");
         upload.setPathwaysSchemaVersion("v1.0");
         // No collection_method
@@ -71,7 +106,7 @@ public class GtfsPathwaysUploadTests {
     void testDataSource() {
         GtfsPathwaysUpload upload = new GtfsPathwaysUpload();
         upload.setCollectedBy("collectedBy");
-        upload.setCollectionDate(LocalDateTime.now().toString());
+        upload.setCollectionDate("2023-03-02T04:22:42.493Z");
         upload.setCollectionMethod("other");
         upload.setPathwaysSchemaVersion("v1.0");
         List<MetaValidationError> errors = upload.isMetadataValidated();
@@ -96,7 +131,7 @@ public class GtfsPathwaysUploadTests {
     void testVersionSchema() {
         GtfsPathwaysUpload upload = new GtfsPathwaysUpload();
         upload.setCollectedBy("collectedBy");
-        upload.setCollectionDate(LocalDateTime.now().toString());
+        upload.setCollectionDate("2023-03-02T04:22:42.493Z");
         upload.setCollectionMethod("other");
         upload.setDataSource("3rdParty");
         List<MetaValidationError> errors = upload.isMetadataValidated();

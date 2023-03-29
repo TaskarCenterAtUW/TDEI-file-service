@@ -6,6 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static com.tdei.filesvc.common.model.MetaErrorCodes.*;
@@ -28,25 +30,56 @@ class GtfsFlexUploadTests {
     void testCollectionDate() {
         GtfsFlexUpload upload = new GtfsFlexUpload();
         upload.setCollectedBy("collectedBy");
+        upload.setDataSource("3rdParty");
+        upload.setFlexSchemaVersion("v2.0");
+        upload.setCollectionMethod("other");
+
         List<MetaValidationError> errors = upload.isMetadataValidated();
         assertThat(errors.size()).isNotEqualTo(0);
         // Get the first error
         MetaValidationError invalidDateError = errors.get(0);
         assertThat(invalidDateError.getCode()).isEqualTo(NO_COLLECTION_DATE);
 
-        // Assert for future dates in collection date
-        upload.setCollectionDate(LocalDateTime.now().plusHours(2).toString());
+        // Invalid/malformed date
+        upload.setCollectionDate("2023-03-02T04:22");
+        //2023-03-02T04:22:42.493Z // Correct time zone
+        List<MetaValidationError> malformedErrors = upload.isMetadataValidated();
+        assertThat(malformedErrors.size()).isNotEqualTo(0);
+        MetaValidationError malformedError = malformedErrors.get(0);
+        assertThat(malformedError.getCode()).isEqualTo(MALFORMED_COLLECTION_DATE);
+
+        // Future date with offset (timezone)
+        upload.setCollectionDate("2024-04-29T10:30:00+05:30");
         List<MetaValidationError> metaErrors = upload.isMetadataValidated();
         assertThat(metaErrors.size()).isNotEqualTo(0);
         MetaValidationError futureError = metaErrors.get(0);
         assertThat(futureError.getCode()).isEqualTo(COLLECTION_DATE_FUTURE);
+
+        //Future date with UTC timezone
+        upload.setCollectionDate("2024-04-29T10:30:00+05:30");
+        List<MetaValidationError> utcFutureErrors = upload.isMetadataValidated();
+        assertThat(utcFutureErrors.size()).isNotEqualTo(0);
+        MetaValidationError utcFutureError = utcFutureErrors.get(0);
+        assertThat(utcFutureError.getCode()).isEqualTo(COLLECTION_DATE_FUTURE);
+
+        // Valid ones
+        // Past date with timezone
+        upload.setCollectionDate("2023-03-29T10:30:00+05:30");
+        List<MetaValidationError> noErrors = upload.isMetadataValidated();
+        assertThat(noErrors.size()).isEqualTo(0);
+
+        // Past date with UTC
+        upload.setCollectionDate("2023-03-02T04:22:42.493Z");
+        List<MetaValidationError> utcNoErrors = upload.isMetadataValidated();
+        assertThat(utcNoErrors.size()).isEqualTo(0);
+
     }
 
     @Test
     void testCollectionMethod() {
         GtfsFlexUpload upload = new GtfsFlexUpload();
         upload.setCollectedBy("collectedBy");
-        upload.setCollectionDate(LocalDateTime.now().toString());
+        upload.setCollectionDate("2023-03-02T04:22:42.493Z");
         upload.setDataSource("3rdParty");
         upload.setFlexSchemaVersion("v2.0");
         // No collection_method
@@ -72,7 +105,7 @@ class GtfsFlexUploadTests {
     void testDataSource() {
         GtfsFlexUpload upload = new GtfsFlexUpload();
         upload.setCollectedBy("collectedBy");
-        upload.setCollectionDate(LocalDateTime.now().toString());
+        upload.setCollectionDate("2023-03-02T04:22:42.493Z");
         upload.setCollectionMethod("other");
         upload.setFlexSchemaVersion("v2.0");
         List<MetaValidationError> errors = upload.isMetadataValidated();
@@ -97,7 +130,7 @@ class GtfsFlexUploadTests {
     void testVersionSchema() {
         GtfsFlexUpload upload = new GtfsFlexUpload();
         upload.setCollectedBy("collectedBy");
-        upload.setCollectionDate(LocalDateTime.now().toString());
+        upload.setCollectionDate("2023-03-02T04:22:42.493Z");
         upload.setCollectionMethod("other");
         upload.setDataSource("3rdParty");
         List<MetaValidationError> errors = upload.isMetadataValidated();

@@ -10,6 +10,9 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.time.DateTimeException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,12 +93,33 @@ public class GtfsFlexUpload {
             MetaValidationError collectionDateError = new MetaValidationError(NO_COLLECTION_DATE, MetaErrorMessages.NO_COLLECTION_DATE);
             errors.add(collectionDateError);
         }
-        //TODO: Write logic to convert string date to Date object and compare
+
+        else {
+            // Example: 2023-03-02T04:22:42.493Z or 2023-03-29T10:30:00+05:30
+            // collection date is given. check for format
+            DateTimeFormatter isoZonedDateTimeFormatter = DateTimeFormatter.ISO_ZONED_DATE_TIME; // Default one given by Java to parse with and without timezone
+            try {
+               LocalDateTime time = LocalDateTime.parse(this.getCollectionDate(),isoZonedDateTimeFormatter);
+               if(time.isAfter(LocalDateTime.now())){
+                   MetaValidationError collectionDateError = new MetaValidationError(COLLECTION_DATE_FUTURE,MetaErrorMessages.COLLECTION_DATE_FUTURE);
+                   errors.add(collectionDateError);
+               }
+               else {
+                   // Validation is ok
+               }
+            }
+            catch (DateTimeException exception){
+                // Date time exception happened
+                MetaValidationError collectionError = new MetaValidationError(MALFORMED_COLLECTION_DATE,MetaErrorMessages.MALFORMED_COLLECTION_DATE);
+                errors.add(collectionError);
+            }
+        }
 //       else if(this.getCollectionDate().isAfter(LocalDateTime.now())){
 //            // Cannot be future date
 //            MetaValidationError collectionDateError = new MetaValidationError(COLLECTION_DATE_FUTURE,MetaErrorMessages.COLLECTION_DATE_FUTURE);
 //            errors.add(collectionDateError);
 //        }
+        // Check the collection date is future or in correct format
 
         // Collection method
         if (this.getCollectionMethod() == null) {

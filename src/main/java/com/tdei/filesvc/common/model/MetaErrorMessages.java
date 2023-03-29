@@ -19,4 +19,6 @@ public interface MetaErrorMessages {
     String NO_GTFS_PATHWAY_VERSION = "pathways_schema_version not specified";
 
     String INVALID_GTFS_PATHWAY_VERSION = "invalid pathways_schema_version. Valid one `v1.0`";
+
+    String MALFORMED_COLLECTION_DATE = "collection_date is in wrong format. Please use format ``";
 }
