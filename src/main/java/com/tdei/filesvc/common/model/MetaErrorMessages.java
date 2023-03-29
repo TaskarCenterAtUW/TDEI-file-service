@@ -20,5 +20,14 @@ public interface MetaErrorMessages {
 
     String INVALID_GTFS_PATHWAY_VERSION = "invalid pathways_schema_version. Valid one `v1.0`";
 
-    String MALFORMED_COLLECTION_DATE = "collection_date is in wrong format. Please use format ``";
+    String MALFORMED_COLLECTION_DATE = "collection_date is in wrong format.";
+
+    String NO_VALID_FROM = "valid_from is empty.";
+    String MALFORMED_VALID_FROM = "valid_from is in wrong format.";
+
+    String NO_VALID_TO = "valid_to is empty";
+    String MALFORMED_VALID_TO = "valid_to is in wrong format.";
+
+    String VALID_FROM_MORE_THAN_YEAR = "valid_from cannot exceed more than a year from current date";
+    String VALID_FROM_AFTER_TO = "valid_from cannot be in future of valid_to";
 }

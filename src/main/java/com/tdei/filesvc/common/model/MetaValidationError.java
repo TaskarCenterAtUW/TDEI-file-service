@@ -20,6 +20,10 @@ public class MetaValidationError extends  Error {
         this.errorDescription = errorDescription;
     }
 
+    public static MetaValidationError from(MetaErrorCodes code, String errorDescription){
+        return new MetaValidationError(code,errorDescription);
+    }
+
     public String getErrorName() {
         return errorName;
     }

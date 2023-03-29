@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -16,9 +15,29 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @ExtendWith(MockitoExtension.class)
 class GtfsFlexUploadTests {
 
+    /**
+     * Dummy GtfsFlexUpload object with all valid
+     * values. Each test case will set the corresponding
+     * parameter and test for the errors
+     * @return
+     */
+    static GtfsFlexUpload getDummyGtfsFlexUpload(){
+        GtfsFlexUpload upload = new GtfsFlexUpload();
+        upload.setCollectedBy("collectedBy");
+        upload.setDataSource("3rdParty");
+        upload.setFlexSchemaVersion("v2.0");
+        upload.setCollectionMethod("other");
+        upload.setCollectionDate("2023-03-02T04:22:42.493Z");
+        upload.setValidFrom("2023-03-02T04:22:42.493Z");
+        upload.setValidTo("2023-04-02T04:22:42.493Z");
+        return upload;
+    }
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
     @Test
     void testCollectedBy() {
-        GtfsFlexUpload upload = new GtfsFlexUpload();
+        GtfsFlexUpload upload = GtfsFlexUploadTests.getDummyGtfsFlexUpload();
         upload.setCollectedBy("morethan50charsmorethan50charsmorethan50charsmorethan50charsmorethan50charsmorethan50chars");
         List<MetaValidationError> errors = upload.isMetadataValidated();
         assertThat(errors.size()).isNotEqualTo(0);
@@ -28,11 +47,8 @@ class GtfsFlexUploadTests {
 
     @Test
     void testCollectionDate() {
-        GtfsFlexUpload upload = new GtfsFlexUpload();
-        upload.setCollectedBy("collectedBy");
-        upload.setDataSource("3rdParty");
-        upload.setFlexSchemaVersion("v2.0");
-        upload.setCollectionMethod("other");
+        GtfsFlexUpload upload = GtfsFlexUploadTests.getDummyGtfsFlexUpload();
+        upload.setCollectionDate(null); // first set the collection date to null
 
         List<MetaValidationError> errors = upload.isMetadataValidated();
         assertThat(errors.size()).isNotEqualTo(0);
@@ -77,11 +93,9 @@ class GtfsFlexUploadTests {
 
     @Test
     void testCollectionMethod() {
-        GtfsFlexUpload upload = new GtfsFlexUpload();
-        upload.setCollectedBy("collectedBy");
-        upload.setCollectionDate("2023-03-02T04:22:42.493Z");
-        upload.setDataSource("3rdParty");
-        upload.setFlexSchemaVersion("v2.0");
+        GtfsFlexUpload upload = GtfsFlexUploadTests.getDummyGtfsFlexUpload();
+        upload.setCollectionMethod(null);
+
         // No collection_method
         List<MetaValidationError> errors = upload.isMetadataValidated();
         assertThat(errors.size()).isNotEqualTo(0);
@@ -103,11 +117,8 @@ class GtfsFlexUploadTests {
 
     @Test
     void testDataSource() {
-        GtfsFlexUpload upload = new GtfsFlexUpload();
-        upload.setCollectedBy("collectedBy");
-        upload.setCollectionDate("2023-03-02T04:22:42.493Z");
-        upload.setCollectionMethod("other");
-        upload.setFlexSchemaVersion("v2.0");
+        GtfsFlexUpload upload = GtfsFlexUploadTests.getDummyGtfsFlexUpload();
+        upload.setDataSource(null);
         List<MetaValidationError> errors = upload.isMetadataValidated();
         assertThat(errors.size()).isNotEqualTo(0);
         MetaValidationError noDataSourceError = errors.get(0);
@@ -128,11 +139,9 @@ class GtfsFlexUploadTests {
 
     @Test
     void testVersionSchema() {
-        GtfsFlexUpload upload = new GtfsFlexUpload();
-        upload.setCollectedBy("collectedBy");
-        upload.setCollectionDate("2023-03-02T04:22:42.493Z");
-        upload.setCollectionMethod("other");
-        upload.setDataSource("3rdParty");
+        GtfsFlexUpload upload = GtfsFlexUploadTests.getDummyGtfsFlexUpload();
+        upload.setFlexSchemaVersion(null);
+
         List<MetaValidationError> errors = upload.isMetadataValidated();
 
         assertThat(errors.size()).isNotEqualTo(0);
@@ -147,6 +156,84 @@ class GtfsFlexUploadTests {
         upload.setFlexSchemaVersion("v2.0");
         List<MetaValidationError> noErrors = upload.isMetadataValidated();
         assertThat(noErrors.size()).isEqualTo(0);
+
+
+    }
+
+    @Test
+    void  testValidFrom(){
+
+        GtfsFlexUpload upload = GtfsFlexUploadTests.getDummyGtfsFlexUpload();
+        upload.setValidFrom(null);
+
+        List<MetaValidationError> errors = upload.isMetadataValidated();
+        assertThat(errors.size()).isNotEqualTo(0);
+        MetaValidationError noValidFrom = errors.get(0);
+        assertThat(noValidFrom.getCode()).isEqualTo(NO_VALID_FROM);
+
+        // Invalid format for valid from
+        upload.setValidFrom("2023-04-23");
+        errors = upload.isMetadataValidated();
+        assertThat(errors.size()).isNotEqualTo(0);
+        MetaValidationError invalidValidFrom = errors.get(0);
+        assertThat(invalidValidFrom.getCode()).isEqualTo(MALFORMED_VALID_FROM);
+
+        // Should not be more than 366 days from current date
+        LocalDateTime oneYearLater = LocalDateTime.now().plusDays(367);
+        //2023-03-02T04:22:42.493Z
+        String formattedDateTime = oneYearLater.format(formatter);
+        upload.setValidFrom(formattedDateTime);
+        errors = upload.isMetadataValidated();
+        assertThat(errors.size()).isNotEqualTo(0);
+        MetaValidationError oneYearLaterError = errors.get(0);
+        assertThat(oneYearLaterError.getCode()).isEqualTo(VALID_FROM_MORE_THAN_YEAR);
+
+        // Valid date should be accepted
+        LocalDateTime now = LocalDateTime.now();
+        String nowDateString = now.format(formatter);
+        upload.setValidFrom(nowDateString);
+        errors = upload.isMetadataValidated();
+        assertThat(errors.size()).isEqualTo(0);
+    }
+
+    @Test
+    void  testValidTo(){
+        GtfsFlexUpload upload = GtfsFlexUploadTests.getDummyGtfsFlexUpload();
+
+        upload.setValidTo(null);
+
+        List<MetaValidationError> errors = upload.isMetadataValidated();
+        assertThat(errors.size()).isNotEqualTo(0);
+        MetaValidationError noValidFrom = errors.get(0);
+        assertThat(noValidFrom.getCode()).isEqualTo(NO_VALID_TO);
+
+        // Invalid valid_to date
+        upload.setValidTo("2023-02-3");
+        errors = upload.isMetadataValidated();
+        assertThat(errors.size()).isNotEqualTo(0);
+        MetaValidationError invalidValidTo = errors.get(0);
+        assertThat(invalidValidTo.getCode()).isEqualTo(MALFORMED_VALID_TO);
+
+        // should be less than valid_from
+        LocalDateTime validFrom = LocalDateTime.now().plusDays(2);
+        LocalDateTime validTo = LocalDateTime.now();
+        String validFromString = validFrom.format(formatter);
+        String validToString = validTo.format(formatter);
+        upload.setValidFrom(validFromString);
+        upload.setValidTo(validToString);
+        errors = upload.isMetadataValidated();
+        assertThat(errors.size()).isNotEqualTo(0);
+        MetaValidationError invalidToFroError = errors.get(0);
+        assertThat(invalidToFroError.getCode()).isEqualTo(VALID_FROM_AFTER_TO);
+
+        // Valid entity for validation
+        LocalDateTime now = LocalDateTime.now();
+        String nowDateString = now.format(formatter);
+        upload.setValidFrom(nowDateString);
+        LocalDateTime tomorrow = LocalDateTime.now().plusDays(1);
+        upload.setValidTo(tomorrow.format(formatter));
+        errors = upload.isMetadataValidated();
+        assertThat(errors.size()).isEqualTo(0);
 
 
     }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static com.tdei.filesvc.common.model.MetaErrorCodes.*;
@@ -13,9 +14,23 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 public class GtfsPathwaysUploadTests {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+    static GtfsPathwaysUpload getDummyGtfsPathwaysUpload() {
+        GtfsPathwaysUpload upload = new GtfsPathwaysUpload();
+        upload.setCollectedBy("collectedBy");
+        upload.setDataSource("3rdParty");
+        upload.setPathwaysSchemaVersion("v1.0");
+        upload.setCollectionMethod("other");
+        upload.setCollectionDate("2023-03-02T04:22:42.493Z");
+        upload.setValidFrom("2023-03-02T04:22:42.493Z");
+        upload.setValidTo("2023-04-02T04:22:42.493Z");
+        return upload;
+    }
+
     @Test
     void testCollectedBy() {
-        GtfsPathwaysUpload upload = new GtfsPathwaysUpload();
+        GtfsPathwaysUpload upload = getDummyGtfsPathwaysUpload();
         upload.setCollectedBy("morethan50charsmorethan50charsmorethan50charsmorethan50charsmorethan50charsmorethan50chars");
         List<MetaValidationError> errors = upload.isMetadataValidated();
         assertThat(errors.size()).isNotEqualTo(0);
@@ -25,11 +40,8 @@ public class GtfsPathwaysUploadTests {
 
     @Test
     void testCollectionDate() {
-        GtfsPathwaysUpload upload = new GtfsPathwaysUpload();
-        upload.setDataSource("3rdParty");
-        upload.setPathwaysSchemaVersion("v1.0");
-        upload.setCollectionMethod("other");
-        upload.setCollectedBy("collectedBy");
+        GtfsPathwaysUpload upload = getDummyGtfsPathwaysUpload();
+        upload.setCollectionDate(null);
         List<MetaValidationError> errors = upload.isMetadataValidated();
         assertThat(errors.size()).isNotEqualTo(0);
         // Get the first error
@@ -78,11 +90,8 @@ public class GtfsPathwaysUploadTests {
 
     @Test
     void testCollectionMethod() {
-        GtfsPathwaysUpload upload = new GtfsPathwaysUpload();
-        upload.setCollectedBy("collectedBy");
-        upload.setCollectionDate("2023-03-02T04:22:42.493Z");
-        upload.setDataSource("3rdParty");
-        upload.setPathwaysSchemaVersion("v1.0");
+        GtfsPathwaysUpload upload = getDummyGtfsPathwaysUpload();
+        upload.setCollectionMethod(null);
         // No collection_method
         List<MetaValidationError> errors = upload.isMetadataValidated();
         assertThat(errors.size()).isNotEqualTo(0);
@@ -104,11 +113,9 @@ public class GtfsPathwaysUploadTests {
 
     @Test
     void testDataSource() {
-        GtfsPathwaysUpload upload = new GtfsPathwaysUpload();
-        upload.setCollectedBy("collectedBy");
-        upload.setCollectionDate("2023-03-02T04:22:42.493Z");
-        upload.setCollectionMethod("other");
-        upload.setPathwaysSchemaVersion("v1.0");
+        GtfsPathwaysUpload upload = getDummyGtfsPathwaysUpload();
+
+        upload.setDataSource(null);
         List<MetaValidationError> errors = upload.isMetadataValidated();
         assertThat(errors.size()).isNotEqualTo(0);
         MetaValidationError noDataSourceError = errors.get(0);
@@ -129,11 +136,9 @@ public class GtfsPathwaysUploadTests {
 
     @Test
     void testVersionSchema() {
-        GtfsPathwaysUpload upload = new GtfsPathwaysUpload();
-        upload.setCollectedBy("collectedBy");
-        upload.setCollectionDate("2023-03-02T04:22:42.493Z");
-        upload.setCollectionMethod("other");
-        upload.setDataSource("3rdParty");
+        GtfsPathwaysUpload upload = getDummyGtfsPathwaysUpload();
+
+        upload.setPathwaysSchemaVersion(null);
         List<MetaValidationError> errors = upload.isMetadataValidated();
 
         assertThat(errors.size()).isNotEqualTo(0);
@@ -148,5 +153,83 @@ public class GtfsPathwaysUploadTests {
         upload.setPathwaysSchemaVersion("v1.0");
         List<MetaValidationError> noErrors = upload.isMetadataValidated();
         assertThat(noErrors.size()).isEqualTo(0);
+    }
+
+    @Test
+    void testValidFrom() {
+
+        GtfsPathwaysUpload upload = getDummyGtfsPathwaysUpload();
+        upload.setValidFrom(null);
+
+        List<MetaValidationError> errors = upload.isMetadataValidated();
+        assertThat(errors.size()).isNotEqualTo(0);
+        MetaValidationError noValidFrom = errors.get(0);
+        assertThat(noValidFrom.getCode()).isEqualTo(NO_VALID_FROM);
+
+        // Invalid format for valid from
+        upload.setValidFrom("2023-04-23");
+        errors = upload.isMetadataValidated();
+        assertThat(errors.size()).isNotEqualTo(0);
+        MetaValidationError invalidValidFrom = errors.get(0);
+        assertThat(invalidValidFrom.getCode()).isEqualTo(MALFORMED_VALID_FROM);
+
+        // Should not be more than 366 days from current date
+        LocalDateTime oneYearLater = LocalDateTime.now().plusDays(367);
+        //2023-03-02T04:22:42.493Z
+        String formattedDateTime = oneYearLater.format(formatter);
+        upload.setValidFrom(formattedDateTime);
+        errors = upload.isMetadataValidated();
+        assertThat(errors.size()).isNotEqualTo(0);
+        MetaValidationError oneYearLaterError = errors.get(0);
+        assertThat(oneYearLaterError.getCode()).isEqualTo(VALID_FROM_MORE_THAN_YEAR);
+
+        // Valid date should be accepted
+        LocalDateTime now = LocalDateTime.now();
+        String nowDateString = now.format(formatter);
+        upload.setValidFrom(nowDateString);
+        errors = upload.isMetadataValidated();
+        assertThat(errors.size()).isEqualTo(0);
+    }
+
+    @Test
+    void testValidTo() {
+        GtfsPathwaysUpload upload = getDummyGtfsPathwaysUpload();
+
+        upload.setValidTo(null);
+
+        List<MetaValidationError> errors = upload.isMetadataValidated();
+        assertThat(errors.size()).isNotEqualTo(0);
+        MetaValidationError noValidFrom = errors.get(0);
+        assertThat(noValidFrom.getCode()).isEqualTo(NO_VALID_TO);
+
+        // Invalid valid_to date
+        upload.setValidTo("2023-02-3");
+        errors = upload.isMetadataValidated();
+        assertThat(errors.size()).isNotEqualTo(0);
+        MetaValidationError invalidValidTo = errors.get(0);
+        assertThat(invalidValidTo.getCode()).isEqualTo(MALFORMED_VALID_TO);
+
+        // should be less than valid_from
+        LocalDateTime validFrom = LocalDateTime.now().plusDays(2);
+        LocalDateTime validTo = LocalDateTime.now();
+        String validFromString = validFrom.format(formatter);
+        String validToString = validTo.format(formatter);
+        upload.setValidFrom(validFromString);
+        upload.setValidTo(validToString);
+        errors = upload.isMetadataValidated();
+        assertThat(errors.size()).isNotEqualTo(0);
+        MetaValidationError invalidToFroError = errors.get(0);
+        assertThat(invalidToFroError.getCode()).isEqualTo(VALID_FROM_AFTER_TO);
+
+        // Valid entity for validation
+        LocalDateTime now = LocalDateTime.now();
+        String nowDateString = now.format(formatter);
+        upload.setValidFrom(nowDateString);
+        LocalDateTime tomorrow = LocalDateTime.now().plusDays(1);
+        upload.setValidTo(tomorrow.format(formatter));
+        errors = upload.isMetadataValidated();
+        assertThat(errors.size()).isEqualTo(0);
+
+
     }
 }
