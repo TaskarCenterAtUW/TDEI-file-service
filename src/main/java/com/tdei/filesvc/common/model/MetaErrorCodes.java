@@ -26,7 +26,9 @@ public enum MetaErrorCodes {
     VALID_FROM_AFTER_TO(4016),
 
     NO_GTFS_PATHWAY_SCHEMA(6001),
-    INVALID_GTFS_PATHWAY_SCHEMA(6002);
+    INVALID_GTFS_PATHWAY_SCHEMA(6002),
+    NO_OSW_SCHEMA(8001),
+    INVALID_OSW_SCHEMA(8002);
 
     private final int status;
 

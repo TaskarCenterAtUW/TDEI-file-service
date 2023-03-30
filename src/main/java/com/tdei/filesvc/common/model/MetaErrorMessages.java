@@ -20,6 +20,10 @@ public interface MetaErrorMessages {
 
     String INVALID_GTFS_PATHWAY_VERSION = "invalid pathways_schema_version. Valid one `v1.0`";
 
+    String NO_OSW_VERSION = "osw_schema_version not specified";
+
+    String INVALID_OSW_VERSION = "invalid osw_schema_version. Valid one `v0.1`";
+
     String MALFORMED_COLLECTION_DATE = "collection_date is in wrong format.";
 
     String NO_VALID_FROM = "valid_from is empty.";

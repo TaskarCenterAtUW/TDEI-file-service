@@ -2,12 +2,21 @@ package com.tdei.filesvc.osw.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tdei.filesvc.common.model.GeoJsonObject;
+import com.tdei.filesvc.common.model.MetaErrorMessages;
+import com.tdei.filesvc.common.model.MetaValidationError;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.time.DateTimeException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.tdei.filesvc.common.model.MetaErrorCodes.*;
 
 /**
  * Describes a OSW file metadata..
@@ -62,4 +71,126 @@ public class OswUpload {
     @NotNull
     @JsonProperty("osw_schema_version")
     private String oswSchemaVersion = null;
+
+    public List<MetaValidationError> isMetadataValidated() {
+        ArrayList<MetaValidationError> errors = new ArrayList<>();
+        DateTimeFormatter isoZonedDateTimeFormatter = DateTimeFormatter.ISO_ZONED_DATE_TIME; // Default one given by Java to parse with and without timezone
+        // Collected By
+        if (this.getCollectedBy() == null) {
+            MetaValidationError collectionMethodError = new MetaValidationError(NO_COLLECTED_BY, MetaErrorMessages.NO_COLLECTED_BY);
+            errors.add(collectionMethodError);
+        } else if (this.getCollectedBy().length() > 50) {
+            MetaValidationError collectedByError = new MetaValidationError(INVALID_COLLECTEDBY_LENGTH, MetaErrorMessages.COLLECTED_BY_LENGTHY);//new MetaValidationError("Invalid length","collected_by should be less than 50 characters");
+            errors.add(collectedByError);
+        }
+        // Collection date
+        if (this.getCollectionDate() == null) {
+            MetaValidationError collectionDateError = new MetaValidationError(NO_COLLECTION_DATE, MetaErrorMessages.NO_COLLECTION_DATE);
+            errors.add(collectionDateError);
+        }
+
+        else {
+            // Example: 2023-03-02T04:22:42.493Z or 2023-03-29T10:30:00+05:30
+            // collection date is given. check for format
+
+            try {
+                LocalDateTime time = LocalDateTime.parse(this.getCollectionDate(),isoZonedDateTimeFormatter);
+                if(time.isAfter(LocalDateTime.now())){
+                    MetaValidationError collectionDateError = new MetaValidationError(COLLECTION_DATE_FUTURE,MetaErrorMessages.COLLECTION_DATE_FUTURE);
+                    errors.add(collectionDateError);
+                }
+                else {
+                    // Validation is ok
+                }
+            }
+            catch (DateTimeException exception){
+                // Date time exception happened
+                MetaValidationError collectionError = new MetaValidationError(MALFORMED_COLLECTION_DATE,MetaErrorMessages.MALFORMED_COLLECTION_DATE);
+                errors.add(collectionError);
+            }
+        }
+
+
+        // Collection method
+        if (this.getCollectionMethod() == null) {
+            MetaValidationError collectionMethodError = new MetaValidationError(NO_COLLECTION_METHOD, MetaErrorMessages.INVALID_COLLECTION_METHOD);
+            errors.add(collectionMethodError);
+        } else {
+            String collectionMethodLowerCase = this.getCollectionMethod().toLowerCase();
+            List<String> validCollectionMethods = new ArrayList<>(
+                    List.of("manual",
+                            "transform",
+                            "generated",
+                            "other"));
+            if (!validCollectionMethods.contains(collectionMethodLowerCase)) {
+                MetaValidationError invalidCollectionMethodError = new MetaValidationError(INVALID_COLLECTION_METHOD, MetaErrorMessages.INVALID_COLLECTION_METHOD);
+                errors.add(invalidCollectionMethodError);
+            }
+        }
+
+        // Data source
+        if (this.getDataSource() == null) {
+            MetaValidationError datasourceError = new MetaValidationError(NO_DATA_SOURCE, MetaErrorMessages.INVALID_DATA_SOURCE);
+            errors.add(datasourceError);
+        } else {
+            List<String> validDataSource = new ArrayList<>(List.of("3rdParty", "TDEITools", "InHouse"));
+            if (!validDataSource.contains(this.getDataSource())) {
+                MetaValidationError invalidDatasourceError = new MetaValidationError(INVALID_DATA_SOURCE, MetaErrorMessages.INVALID_DATA_SOURCE);
+                errors.add(invalidDatasourceError);
+            }
+        }
+        LocalDateTime validFrom = null;
+        // Valid to and valid from
+        if(this.getValidFrom() == null){
+            errors.add(MetaValidationError.from(NO_VALID_FROM,MetaErrorMessages.NO_VALID_FROM));
+        } else {
+            // Check the date
+            try {
+                LocalDateTime time = LocalDateTime.parse(this.getValidFrom(),isoZonedDateTimeFormatter);
+                // should not be more than year
+                if(time.isAfter(LocalDateTime.now().plusDays(366))){
+                    errors.add(MetaValidationError.from(VALID_FROM_MORE_THAN_YEAR,MetaErrorMessages.VALID_FROM_MORE_THAN_YEAR));
+                }
+                else {
+                    // Validation is ok
+                    validFrom = time;
+                }
+            }
+            catch (DateTimeException exception){
+                // Date time exception happened
+                errors.add(MetaValidationError.from(MALFORMED_VALID_FROM,MetaErrorMessages.MALFORMED_VALID_FROM));
+            }
+        }
+        if(this.getValidTo() == null){
+            errors.add(MetaValidationError.from(NO_VALID_TO,MetaErrorMessages.NO_VALID_TO));
+        }
+        else {
+            try {
+                LocalDateTime time = LocalDateTime.parse(this.getValidTo(),isoZonedDateTimeFormatter);
+
+                // should not be more than year
+                if(validFrom != null && validFrom.isAfter(time)){
+                    // Valid from is in future
+                    errors.add(MetaValidationError.from(VALID_FROM_AFTER_TO,MetaErrorMessages.VALID_FROM_AFTER_TO));
+                }
+                else{
+                    // Validation ok
+                }
+            }
+            catch (DateTimeException exception){
+                // Date time exception happened
+                errors.add(MetaValidationError.from(MALFORMED_VALID_TO,MetaErrorMessages.MALFORMED_VALID_TO));
+            }
+
+        }
+        if (this.getOswSchemaVersion() == null) {
+            MetaValidationError noFlexSchemaError = new MetaValidationError(NO_OSW_SCHEMA, MetaErrorMessages.NO_OSW_VERSION);
+            errors.add(noFlexSchemaError);
+        } else if (!this.getOswSchemaVersion().equals("v0.1")) { // To be shifted to other service soon
+            MetaValidationError invalidFlexSchemaError = new MetaValidationError(INVALID_OSW_SCHEMA, MetaErrorMessages.INVALID_OSW_VERSION);
+            errors.add(invalidFlexSchemaError);
+        }
+
+        return errors;
+    }
 }
