@@ -20,10 +20,20 @@ public interface MetaErrorMessages {
 
     String INVALID_GTFS_PATHWAY_VERSION = "invalid pathways_schema_version. Valid one `v1.0`";
 
+    String NO_OSW_VERSION = "osw_schema_version not specified";
+
+    String INVALID_OSW_VERSION = "invalid osw_schema_version. Valid one `v0.1`";
+
     String MALFORMED_COLLECTION_DATE = "collection_date is in wrong format.";
 
     String NO_VALID_FROM = "valid_from is empty.";
     String MALFORMED_VALID_FROM = "valid_from is in wrong format.";
+
+    String NO_PUBLICATION_DATE = "publication_date is empty";
+
+    String MALFORMED_PUBLICATION_DATE = "publication_date is in wrong format";
+
+    String FUTURE_PUBLICATION_DATE = "publication_date cannot be in future";
 
     String NO_VALID_TO = "valid_to is empty";
     String MALFORMED_VALID_TO = "valid_to is in wrong format.";

@@ -1,5 +1,7 @@
 package com.tdei.filesvc.osw.controller;
 
+import com.tdei.filesvc.common.model.MetaValidationError;
+import com.tdei.filesvc.core.config.exception.handler.exceptions.MetadataValidationException;
 import com.tdei.filesvc.osw.controller.contract.IOswFileController;
 import com.tdei.filesvc.osw.model.OswUpload;
 import com.tdei.filesvc.osw.service.OswStorageService;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,6 +25,13 @@ public class OswFileController implements IOswFileController {
 
     @Override
     public ResponseEntity<String> uploadOswFile(OswUpload meta, String tdeiOrgId, String userId, MultipartFile file, HttpServletRequest httpServletRequest) throws FileUploadException {
-        return ResponseEntity.ok(storageService.uploadBlob(meta, tdeiOrgId, userId, file));
+        List<MetaValidationError> metaValidationErrors = meta.isMetadataValidated();
+        if(metaValidationErrors.isEmpty()) {
+            return ResponseEntity.ok(storageService.uploadBlob(meta, tdeiOrgId, userId, file));
+        }
+        else {
+            // Send the validation errors
+            throw new MetadataValidationException("Error validating Metadata",metaValidationErrors);
+        }
     }
 }
