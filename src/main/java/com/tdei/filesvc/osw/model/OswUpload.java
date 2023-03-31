@@ -46,16 +46,20 @@ public class OswUpload {
     @JsonProperty("collection_method")
     private String collectionMethod = null;
 
-    @Schema(required = true, description = "date from which this file is valid")
-    @NotNull
+//    @Schema(required = true, description = "date from which this file is valid")
+//    @NotNull
+//    @Valid
+//    @JsonProperty("valid_from")
+//    private String validFrom = null;
+//
+//    @Schema(description = "date until which this data is valid")
+//    @Valid
+//    @JsonProperty("valid_to")
+//    private String validTo = null;
+    @Schema(description = "Publication date of OSW")
     @Valid
-    @JsonProperty("valid_from")
-    private String validFrom = null;
-
-    @Schema(description = "date until which this data is valid")
-    @Valid
-    @JsonProperty("valid_to")
-    private String validTo = null;
+    @JsonProperty("publication_date")
+    private String publicationDate = null;
 
     @Schema(required = true, description = "Description of data source or sources from which the data was collected. See Best Practices document for information on how to format this string.")
     @NotNull
@@ -141,48 +145,27 @@ public class OswUpload {
         }
         LocalDateTime validFrom = null;
         // Valid to and valid from
-        if(this.getValidFrom() == null){
-            errors.add(MetaValidationError.from(NO_VALID_FROM,MetaErrorMessages.NO_VALID_FROM));
+        if(this.getPublicationDate() == null){
+            errors.add(MetaValidationError.from(NO_PUBLICATION_DATE,MetaErrorMessages.NO_PUBLICATION_DATE));
         } else {
             // Check the date
             try {
-                LocalDateTime time = LocalDateTime.parse(this.getValidFrom(),isoZonedDateTimeFormatter);
+                LocalDateTime time = LocalDateTime.parse(this.getPublicationDate(),isoZonedDateTimeFormatter);
                 // should not be more than year
-                if(time.isAfter(LocalDateTime.now().plusDays(366))){
-                    errors.add(MetaValidationError.from(VALID_FROM_MORE_THAN_YEAR,MetaErrorMessages.VALID_FROM_MORE_THAN_YEAR));
+                if(time.isAfter(LocalDateTime.now())){
+                    errors.add(MetaValidationError.from(PUBLICATION_DATE_FUTURE,MetaErrorMessages.FUTURE_PUBLICATION_DATE));
                 }
                 else {
                     // Validation is ok
-                    validFrom = time;
+//                    validFrom = time;
                 }
             }
             catch (DateTimeException exception){
                 // Date time exception happened
-                errors.add(MetaValidationError.from(MALFORMED_VALID_FROM,MetaErrorMessages.MALFORMED_VALID_FROM));
+                errors.add(MetaValidationError.from(MALFORMED_PUBLICATION_DATE,MetaErrorMessages.MALFORMED_PUBLICATION_DATE));
             }
         }
-        if(this.getValidTo() == null){
-            errors.add(MetaValidationError.from(NO_VALID_TO,MetaErrorMessages.NO_VALID_TO));
-        }
-        else {
-            try {
-                LocalDateTime time = LocalDateTime.parse(this.getValidTo(),isoZonedDateTimeFormatter);
 
-                // should not be more than year
-                if(validFrom != null && validFrom.isAfter(time)){
-                    // Valid from is in future
-                    errors.add(MetaValidationError.from(VALID_FROM_AFTER_TO,MetaErrorMessages.VALID_FROM_AFTER_TO));
-                }
-                else{
-                    // Validation ok
-                }
-            }
-            catch (DateTimeException exception){
-                // Date time exception happened
-                errors.add(MetaValidationError.from(MALFORMED_VALID_TO,MetaErrorMessages.MALFORMED_VALID_TO));
-            }
-
-        }
         if (this.getOswSchemaVersion() == null) {
             MetaValidationError noFlexSchemaError = new MetaValidationError(NO_OSW_SCHEMA, MetaErrorMessages.NO_OSW_VERSION);
             errors.add(noFlexSchemaError);

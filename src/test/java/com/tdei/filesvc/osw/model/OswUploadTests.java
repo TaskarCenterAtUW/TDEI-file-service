@@ -25,8 +25,7 @@ public class OswUploadTests {
         upload.setOswSchemaVersion("v0.1");
         upload.setCollectionMethod("other");
         upload.setCollectionDate("2023-03-02T04:22:42.493Z");
-        upload.setValidFrom("2023-03-02T04:22:42.493Z");
-        upload.setValidTo("2023-04-02T04:22:42.493Z");
+        upload.setPublicationDate("2023-03-02T04:22:42.493Z");
         return upload;
     }
 
@@ -158,81 +157,102 @@ public class OswUploadTests {
     }
 
     @Test
-    void  testValidFrom(){
-
-        OswUpload upload = OswUploadTests.getDummyOswUpload();
-
-        upload.setValidFrom(null);
-
+    void testPublicationDate() {
+        OswUpload upload = getDummyOswUpload();
+        upload.setPublicationDate(null);
         List<MetaValidationError> errors = upload.isMetadataValidated();
         assertThat(errors.size()).isNotEqualTo(0);
-        MetaValidationError noValidFrom = errors.get(0);
-        assertThat(noValidFrom.getCode()).isEqualTo(NO_VALID_FROM);
-
-        // Invalid format for valid from
-        upload.setValidFrom("2023-04-23");
-        errors = upload.isMetadataValidated();
-        assertThat(errors.size()).isNotEqualTo(0);
-        MetaValidationError invalidValidFrom = errors.get(0);
-        assertThat(invalidValidFrom.getCode()).isEqualTo(MALFORMED_VALID_FROM);
-
-        // Should not be more than 366 days from current date
-        LocalDateTime oneYearLater = LocalDateTime.now().plusDays(367);
+        MetaValidationError noPublicationDate = errors.get(0);
+        assertThat(noPublicationDate.getCode()).isEqualTo(NO_PUBLICATION_DATE);
+        // future date
         //2023-03-02T04:22:42.493Z
-        String formattedDateTime = oneYearLater.format(formatter);
-        upload.setValidFrom(formattedDateTime);
+        upload.setPublicationDate("2025-03-02T04:22:42.493Z");
         errors = upload.isMetadataValidated();
         assertThat(errors.size()).isNotEqualTo(0);
-        MetaValidationError oneYearLaterError = errors.get(0);
-        assertThat(oneYearLaterError.getCode()).isEqualTo(VALID_FROM_MORE_THAN_YEAR);
-
-        // Valid date should be accepted
-        LocalDateTime now = LocalDateTime.now();
-        String nowDateString = now.format(formatter);
-        upload.setValidFrom(nowDateString);
-        errors = upload.isMetadataValidated();
-        assertThat(errors.size()).isEqualTo(0);
-    }
-
-    @Test
-    void  testValidTo(){
-        OswUpload upload = OswUploadTests.getDummyOswUpload();
-
-        upload.setValidTo(null);
-
-        List<MetaValidationError> errors = upload.isMetadataValidated();
-        assertThat(errors.size()).isNotEqualTo(0);
-        MetaValidationError noValidFrom = errors.get(0);
-        assertThat(noValidFrom.getCode()).isEqualTo(NO_VALID_TO);
-
-        // Invalid valid_to date
-        upload.setValidTo("2023-02-3");
-        errors = upload.isMetadataValidated();
-        assertThat(errors.size()).isNotEqualTo(0);
-        MetaValidationError invalidValidTo = errors.get(0);
-        assertThat(invalidValidTo.getCode()).isEqualTo(MALFORMED_VALID_TO);
-
-        // should be less than valid_from
-        LocalDateTime validFrom = LocalDateTime.now().plusDays(2);
-        LocalDateTime validTo = LocalDateTime.now();
-        String validFromString = validFrom.format(formatter);
-        String validToString = validTo.format(formatter);
-        upload.setValidFrom(validFromString);
-        upload.setValidTo(validToString);
-        errors = upload.isMetadataValidated();
-        assertThat(errors.size()).isNotEqualTo(0);
-        MetaValidationError invalidToFroError = errors.get(0);
-        assertThat(invalidToFroError.getCode()).isEqualTo(VALID_FROM_AFTER_TO);
-
-        // Valid entity for validation
-        LocalDateTime now = LocalDateTime.now();
-        String nowDateString = now.format(formatter);
-        upload.setValidFrom(nowDateString);
-        LocalDateTime tomorrow = LocalDateTime.now().plusDays(1);
-        upload.setValidTo(tomorrow.format(formatter));
+        MetaValidationError futurePublicationDate = errors.get(0);
+        assertThat(futurePublicationDate.getCode()).isEqualTo(PUBLICATION_DATE_FUTURE);
+        // valid publication date
+        upload.setPublicationDate("2023-03-02T04:22:42.493Z");
         errors = upload.isMetadataValidated();
         assertThat(errors.size()).isEqualTo(0);
 
 
     }
+
+//    @Test
+//    void  testValidFrom(){
+//
+//        OswUpload upload = OswUploadTests.getDummyOswUpload();
+//
+//        upload.setValidFrom(null);
+//
+//        List<MetaValidationError> errors = upload.isMetadataValidated();
+//        assertThat(errors.size()).isNotEqualTo(0);
+//        MetaValidationError noValidFrom = errors.get(0);
+//        assertThat(noValidFrom.getCode()).isEqualTo(NO_VALID_FROM);
+//
+//        // Invalid format for valid from
+//        upload.setValidFrom("2023-04-23");
+//        errors = upload.isMetadataValidated();
+//        assertThat(errors.size()).isNotEqualTo(0);
+//        MetaValidationError invalidValidFrom = errors.get(0);
+//        assertThat(invalidValidFrom.getCode()).isEqualTo(MALFORMED_VALID_FROM);
+//
+//        // Should not be more than 366 days from current date
+//        LocalDateTime oneYearLater = LocalDateTime.now().plusDays(367);
+//        //2023-03-02T04:22:42.493Z
+//        String formattedDateTime = oneYearLater.format(formatter);
+//        upload.setValidFrom(formattedDateTime);
+//        errors = upload.isMetadataValidated();
+//        assertThat(errors.size()).isNotEqualTo(0);
+//        MetaValidationError oneYearLaterError = errors.get(0);
+//        assertThat(oneYearLaterError.getCode()).isEqualTo(VALID_FROM_MORE_THAN_YEAR);
+//
+//        // Valid date should be accepted
+//        LocalDateTime now = LocalDateTime.now();
+//        String nowDateString = now.format(formatter);
+//        upload.setValidFrom(nowDateString);
+//        errors = upload.isMetadataValidated();
+//        assertThat(errors.size()).isEqualTo(0);
+//    }
+//
+//    @Test
+//    void  testValidTo(){
+//        OswUpload upload = OswUploadTests.getDummyOswUpload();
+//
+//        upload.setValidTo(null);
+//
+//        List<MetaValidationError> errors = upload.isMetadataValidated();
+//        assertThat(errors.size()).isNotEqualTo(0);
+//        MetaValidationError noValidFrom = errors.get(0);
+//        assertThat(noValidFrom.getCode()).isEqualTo(NO_VALID_TO);
+//
+//        // Invalid valid_to date
+//        upload.setValidTo("2023-02-3");
+//        errors = upload.isMetadataValidated();
+//        assertThat(errors.size()).isNotEqualTo(0);
+//        MetaValidationError invalidValidTo = errors.get(0);
+//        assertThat(invalidValidTo.getCode()).isEqualTo(MALFORMED_VALID_TO);
+//
+//        // should be less than valid_from
+//        LocalDateTime validFrom = LocalDateTime.now().plusDays(2);
+//        LocalDateTime validTo = LocalDateTime.now();
+//        String validFromString = validFrom.format(formatter);
+//        String validToString = validTo.format(formatter);
+//        upload.setValidFrom(validFromString);
+//        upload.setValidTo(validToString);
+//        errors = upload.isMetadataValidated();
+//        assertThat(errors.size()).isNotEqualTo(0);
+//        MetaValidationError invalidToFroError = errors.get(0);
+//        assertThat(invalidToFroError.getCode()).isEqualTo(VALID_FROM_AFTER_TO);
+//
+//        // Valid entity for validation
+//        LocalDateTime now = LocalDateTime.now();
+//        String nowDateString = now.format(formatter);
+//        upload.setValidFrom(nowDateString);
+//        LocalDateTime tomorrow = LocalDateTime.now().plusDays(1);
+//        upload.setValidTo(tomorrow.format(formatter));
+//        errors = upload.isMetadataValidated();
+//        assertThat(errors.size()).isEqualTo(0);
+//    }
 }

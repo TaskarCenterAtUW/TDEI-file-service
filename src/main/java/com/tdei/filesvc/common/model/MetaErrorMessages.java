@@ -29,6 +29,12 @@ public interface MetaErrorMessages {
     String NO_VALID_FROM = "valid_from is empty.";
     String MALFORMED_VALID_FROM = "valid_from is in wrong format.";
 
+    String NO_PUBLICATION_DATE = "publication_date is empty";
+
+    String MALFORMED_PUBLICATION_DATE = "publication_date is in wrong format";
+
+    String FUTURE_PUBLICATION_DATE = "publication_date cannot be in future";
+
     String NO_VALID_TO = "valid_to is empty";
     String MALFORMED_VALID_TO = "valid_to is in wrong format.";
 
