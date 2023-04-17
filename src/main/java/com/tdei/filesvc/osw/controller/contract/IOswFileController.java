@@ -2,7 +2,6 @@ package com.tdei.filesvc.osw.controller.contract;
 
 import com.tdei.filesvc.osw.model.OswUpload;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,7 +23,7 @@ public interface IOswFileController {
 
     @Operation(summary = "Uploading the OSW file", description = "Uploading the file.  Returns the filePath for uploaded blob. ")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful response - Returns the filePath for uploaded blob.", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = String.class)))),
+            @ApiResponse(responseCode = "200", description = "Successful response - Returns the filePath for uploaded blob.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "500", description = "An server error occurred.", content = @Content)
     })
     @RequestMapping(value = "uploadFile",
