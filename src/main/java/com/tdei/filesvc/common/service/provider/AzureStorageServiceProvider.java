@@ -30,7 +30,6 @@ public class AzureStorageServiceProvider implements IStorageService {
 
     private void initStorage() {
         blobServiceAsyncClient = new BlobServiceClientBuilder()
-                .endpoint(applicationProperties.getCloud().getAzure().getStorage().getBlob().getEndpoint())
                 .connectionString(applicationProperties.getCloud().getAzure().getStorage().getBlob().getConnectionString())
                 .buildAsyncClient();
     }

@@ -83,9 +83,6 @@ public class ApplicationProperties {
                 @Data
                 @NoArgsConstructor
                 public static class BlobProperty {
-                    private String accountName;
-                    private String accountKey;
-                    private String endpoint;
                     private String connectionString;
                 }
             }
