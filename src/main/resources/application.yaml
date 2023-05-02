@@ -45,9 +45,6 @@ cloud:
   azure:
     storage:
       blob:
-        account-name: tdeisamplestorage
-        account-key: "${CLOUD_AZURE_STORAGE_BLOB_ACCOUNT_KEY}"
-        endpoint: "${CLOUD_AZURE_STORAGE_BLOB_ENDPOINT}"
         connection-string: "${CLOUD_AZURE_STORAGE_BLOB_CONNECTION_STRING}"
     service-bus:
       connection-string: "${CLOUD_AZURE_SERVICE_BUS_CONNECTION_STRING}"
