@@ -6,30 +6,71 @@ data.
 
 ### File Service workflow
 
-1. **Client**, makes the HTTP multipart call to the **Gateway API** for the specified file type.
+```mermaid
+graph LR;
+    E(Client) --->|1. Request| A(Gateway) -->|3. Upload| B(File Service) -->|6. Publishes| C(Upload topic)
+    B -->|4. Save| D(File Storage)
+    A -->|2. Auth| F(Auth Service)
+    B -->|5. tdei_record_id| A(Gateway)
+```
+
+1. The client makes the HTTP POST call to the gateway to upload the specific file type. As
+   per [Gateway API Doc](https://tdei-gateway-dev.azurewebsites.net/swagger-ui/index.html#/) client uploads the file
+   along with metadata information. Example metadata below:
+
+Ex.
 
 ``` 
 Multipart request will contain two information, one file stream and other metadata information
 
 { file : octate-stream }
 __________________________________
+"metadata" :
 {
- metadata :
-   {
-      validFrom : XXXX,
-      validTo : XXXX
-      ....
-    }
- }
+  "tdei_org_id": "dedd49bd-f225-45d5-8523-b819dcc2c648",
+  "tdei_station_id": "791a89f4-132f-4224-a837-afc77b5dff7f",
+  "collected_by": "testuser",
+  "collection_date": "2023-03-02T04:22:42.493Z",
+  "collection_method": "manual",
+  "valid_from": "2023-04-02T04:22:42.493Z",
+  "valid_to": "2023-04-03T04:02:42.493Z",
+  "data_source": "TDEITools",
+  "polygon": {}, //valid polygon
+  "pathways_schema_version": "v1.0"
+}
 ``` 
 
-2. Gateway service routes this request to File Service
-3. On API request file service will perform below job
-    1. Generate unique record id (unique id) for each job.
-    2. Retrieve the file stream and saves to the cloud storage under the specified file container ( folder)
-    3. Upon successful upload to the cloud storage, it keeps the reference of the uploaded file path
-    4. Compose new queue message with requested metadata and file upload path and publish to file specific topic
-    5. Finally return the generated record id back to Gateway service for further tracking of the request.
+2. The Gateway authenticates and authorises the upload request by the client against the Auth service.
+   Gateway responds back to the client with an unauthorised request if the authorization is unsuccessful.
+3. Upon successful authentication and authorization, the Gateway redirects the request to the file service for uploading
+   the file.
+4. The file service validates the provided metadata information, and upon successful metadata validation, the file gets
+   persisted to the Azure blob storage under the per file type container (folder).
+
+- Metadata validation is described in detail [here](./metadata-validation.md)
+- Metadata static validation happens at the file service.
+- Metadata data validation happens at the data service.
+
+5Upon successful upload, the "File Service" returns the unique system generated tdei_record_id as a response to **
+Gateway**.
+
+6. In addition, File Service generates the payload with filePath and meta information and pushes the information to
+   the topic `upload-topic`.
+
+Ex.
+
+```js
+{
+  filePath : blob\gtfs-pathways\test-2022-08-08.zip,
+  tdei_record_id: "a4820e1a68394ba9b1714436de70ee1d"
+  metadata :
+  {
+    validFrom : XXXX,
+    validTo : XXXX
+    .....
+  }
+}
+```
 
 ## System requirements
 
@@ -60,21 +101,28 @@ $ git clone https://TDEI-UW@dev.azure.com/TDEI-UW/TDEI/_git/file-service
 
 ## Secrets
 
-Application secrets are not included in the code repository. Below are the instruction for each environment
+Application secrets are not included in the code repository. File service relies on below-mentioned environment variable
 
-###### Local
+| Environment Variable                       | Description                                        |
+|--------------------------------------------|----------------------------------------------------|
+| GTFS_FLEX_CONTAINER_NAME                   | Name of the blob container to upload file          |
+| GTFS_FLEX_UPLOAD_ALLOWED_EXTENSIONS        | File extension allowed for upload. comma separated |
+| GTFS_FLEX_UPLOAD_TOPIC_NAME                | Name of the upload topic to publish message        |
+| GTFS_PATHWAYS_CONTAINER_NAME               | Name of the blob container to upload file          |
+| GTFS_PATHWAYS_UPLOAD_ALLOWED_EXTENSIONS    | File extension allowed for upload. comma separated |
+| GTFS_PATHWAYS_UPLOAD_TOPIC_NAME            | Name of the upload topic to publish message        |
+| OSW_CONTAINER_NAME                         | Name of the blob container to upload file          |
+| OSW_UPLOAD_ALLOWED_EXTENSIONS              | File extension allowed for upload. comma separated |
+| OSW_UPLOAD_TOPIC_NAME                      | Name of the upload topic to publish message        |
+| CLOUD_AZURE_STORAGE_BLOB_CONNECTION_STRING | Azure storage connection string                    |
+| CLOUD_AZURE_SERVICE_BUS_CONNECTION_STRING  | Azure service bus connection string                |
 
-Request for **developer-local-properties.yaml** file from Admin, which should be copied to below location
+###### Spring Local ENV Property Setting
+
+Create **developer-local-properties.yaml** file under root of `resource` folder and set the application.yaml
+placeholders.
 
 ```src/main/resources/developer-local-properties.yaml```
-
-###### DEV/PROD
-
-Required properties will be set as an environment variables on the deployment environment.
-
-        CLOUD_AZURE_STORAGE_BLOB_ACCOUNT_KEY
-        CLOUD_AZURE_STORAGE_BLOB_CONNECTION_STRING
-        CLOUD_AZURE_SERVICE_BUS_CONNECTION_STRING
 
 ## Building the project
 
@@ -121,22 +169,6 @@ http://localhost:8080/swagger-ui/index.html
 ```
 $ mvn test
 ```
-
-## CI/CD [Azure Pipeline]
-
-### Continuous Integration (CI)
-
-Currently, CI is not implemented as part of Azure pipeline. Test automated integration will be taken up in next
-development cycle.
-
-### Continuous Deployment (CD)
-
-Check-in to the master branch triggers the Azure pipeline [gateway] CI/CD process which will build the source code,
-generate the package and create the docker image. Docker image will then be deployed to Azure app services.
-
-Process Flow Diagram:
-
-![](src/main/resources/static/images/deployment-pipeline.png)
 
 Development API documentation link
 
