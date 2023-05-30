@@ -51,8 +51,8 @@ __________________________________
 - Metadata static validation happens at the file service.
 - Metadata data validation happens at the data service.
 
-5Upon successful upload, the "File Service" returns the unique system generated tdei_record_id as a response to **
-Gateway**.
+5. Upon successful upload, the "File Service" returns the unique system generated tdei_record_id as a response to **
+   Gateway**.
 
 6. In addition, File Service generates the payload with filePath and meta information and pushes the information to
    the topic `upload-topic`.
@@ -117,12 +117,20 @@ Application secrets are not included in the code repository. File service relies
 | CLOUD_AZURE_STORAGE_BLOB_CONNECTION_STRING | Azure storage connection string                    |
 | CLOUD_AZURE_SERVICE_BUS_CONNECTION_STRING  | Azure service bus connection string                |
 
-###### Spring Local ENV Property Setting
+## Secrets
 
-Create **developer-local-properties.yaml** file under root of `resource` folder and set the application.yaml
+Application secrets are not included in the code repository. Below are the instruction for each environment
+
+###### DEV
+
+Create **developer-local-properties.yaml** file under root of `resource` folder and override the application.yaml
 placeholders.
 
 ```src/main/resources/developer-local-properties.yaml```
+
+###### PROD
+
+Secrets are configured as an environment variables on the deployment server.
 
 ## Building the project
 
