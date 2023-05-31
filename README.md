@@ -130,7 +130,7 @@ placeholders.
 
 ###### PROD
 
-Secrets are configured as an environment variables on the deployment server.
+Secrets are configured as environment variables on the deployment server.
 
 ## Building the project
 
@@ -180,4 +180,4 @@ $ mvn test
 
 Development API documentation link
 
-https://tdei-filesvc.azurewebsites.net/swagger-ui/index.html
+https://tdei-file-service-dev.azurewebsites.net/swagger-ui/index.html
