@@ -54,7 +54,7 @@ __________________________________
 5. Upon successful upload, the "File Service" returns the unique system generated tdei_record_id as a response to **
    Gateway**.
 
-6. In addition, File Service generates the payload with filePath and meta information and pushes the information to
+6. In addition, File Service generates the payload with filePath and meta information and  pushes the information to
    the topic `upload-topic`.
 
 Ex.
